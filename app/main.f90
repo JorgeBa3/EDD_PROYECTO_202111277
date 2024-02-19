@@ -1,12 +1,21 @@
 program main
   use json_module
+  use doubly_linked_list_m
+  use Circular_linked_list_m
+  use list_of_lists_m
+  use linked_list_m
+  use lista_ventanillas_m
+  use cola_recepcion_m
   implicit none
 
   type(json_file) :: json
   logical :: found
-  integer :: id, img_g, img_p, num_pasadas, i, opcion
+  integer :: id, img_g, img_p, num_pasadas, i, opcion, n_ventanillas
   character(len=:),allocatable :: nombre, texto
   character(len=100) :: id_str, nombre_json  ! Assuming a maximum of 10 characters for id string
+  type(lista_v) :: lista_ventanillas
+  type(cola_r) :: cola_recepcion
+
 
     ! initialize the class
   call json%initialize()
@@ -111,29 +120,32 @@ end do
   do i = 1, num_pasadas
     write(id_str, '(I10)') i  ! Convert integer to string
     call json%get('['//trim(adjustl(id_str))//'].id', id, found)
-    print*, 'id: ', id, found
     if (.not. found) stop 11
 
     write(id_str, '(I10)') i  ! Convert integer to string
     call json%get('['//trim(adjustl(id_str))//'].nombre', nombre, found)
-    print*, 'nombre: ', nombre, found
     if (.not. found) stop 12
 
     write(id_str, '(I10)') i  ! Convert integer to string
     call json%get('['//trim(adjustl(id_str))//'].img_g', img_g, found)
-    print*, 'img_g: ', img_g, found
     if (.not. found) stop 13
 
     write(id_str, '(I10)') i  ! Convert integer to string
     call json%get('['//trim(adjustl(id_str))//'].img_p', img_p, found)
-    print*, 'img_p: ', img_p, found
     if (.not. found) stop 14
-  end do
+    call cola_recepcion%push(id, img_g, img_p)
+    end do
+    call cola_recepcion%print()
       end subroutine carga_masiva_clientes
 
       subroutine cantidad_ventanillas()
           print *, 'Ha seleccionado Cantidad de ventanillas'
-          ! Aqui puedes incluir el codigo para establecer la cantidad de ventanillas
+          print *, 'Ingrese la cantidad  de ventanillas:'
+          read(*, *) n_ventanillas
+          do i = 1, n_ventanillas
+              call lista_ventanillas%push(i)
+          end do
+          call lista_ventanillas%print()
       end subroutine cantidad_ventanillas
 
 
