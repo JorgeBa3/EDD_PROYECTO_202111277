@@ -1,26 +1,48 @@
 program main
-  use json_module
-  use doubly_linked_list_m
-  use Circular_linked_list_m
-  use list_of_lists_m
-  use linked_list_m
-  use lista_ventanillas_m
-  use cola_recepcion_m
-  implicit none
+    use json_module
+    use doubly_linked_list_m
+    use Circular_linked_list_m
+    use list_of_lists_m
+    use linked_list_m
+    use lista_ventanillas_m
+    use cola_recepcion_m
+    use pila_img_m
 
-  type(json_file) :: json
-  logical :: found
-  integer :: id, img_g, img_p, num_pasadas, i, opcion, n_ventanillas
-  character(len=:),allocatable :: nombre, texto
-  character(len=100) :: id_str, nombre_json  ! Assuming a maximum of 10 characters for id string
-  type(lista_v) :: lista_ventanillas
-  type(cola_r) :: cola_recepcion
+    implicit none
 
+    type(json_file) :: json
+    logical :: found
+    integer :: id, img_g, img_p, num_pasadas, i, opcion, n_ventanillas, j,k 
+    character(len=:),allocatable :: nombre, texto
+    character(len=100) :: id_str, nombre_json, nombre_completo
+    type(lista_v) :: lista_ventanillas
+    type(cola_r) :: cola_recepcion
+    type(pila_i) :: pila_imagenes
 
-    ! initialize the class
-  call json%initialize()
+    !Clientes aleatorios
+    integer :: new_img_p, new_img_g, num_clientes_aleatorios
+    integer, parameter :: num_nombres = 7
+integer, parameter :: num_apellidos = 7
+real :: rnd1(1), rnd2(1), rnd3(1), rnd4(1), rnd5(1)
+character(len=40), dimension(num_nombres) :: nombres
+character(len=40), dimension(num_apellidos) :: apellidos
+integer :: values(8) ! Array para almacenar los valores de fecha y hora
+character(len=8) :: date_string, time_string ! Cadenas para almacenar la fecha y la hora
 
-  do
+! Asignar nombres
+nombres = [ "Jorge ", "Jose  ", "Juan  ", "Maria ", "Carlos", "Luis  ", "Ana   " ]
+
+! Asignar apellidos
+apellidos = ["De Leon  ", "Batres   ", "Gonzalez ", "Lopez    ", "Martinez ", "Perez    ", "Sanchez  " ]
+
+! Llamar a date_and_time para obtener la fecha y la hora actual
+call date_and_time(values=values)
+
+! Inicializar generador de números aleatorios con el tiempo actual
+call srand(seed=int(100*values(7))) ! Usamos los segundos como semilla
+call json%initialize()
+
+do
     call mostrar_menu_principal()
     read(*,*) opcion
 
@@ -133,7 +155,7 @@ end do
     write(id_str, '(I10)') i  ! Convert integer to string
     call json%get('['//trim(adjustl(id_str))//'].img_p', img_p, found)
     if (.not. found) stop 14
-    call cola_recepcion%push(id, img_g, img_p)
+    call cola_recepcion%push(id, nombre, img_g, img_p)
     end do
     call cola_recepcion%print()
       end subroutine carga_masiva_clientes
@@ -149,10 +171,50 @@ end do
       end subroutine cantidad_ventanillas
 
 
-  subroutine ejecutar_paso()
-      print *, 'Ha seleccionado Ejecutar paso'
-      ! Aqui puedes incluir el codigo para ejecutar un paso
-  end subroutine ejecutar_paso
+    subroutine ejecutar_paso()
+        print *, 'Ha seleccionado Ejecutar paso'
+        call random_number(rnd5)
+        num_clientes_aleatorios = mod(int(rnd5(1) * 1000), 4)
+        print *, 'Numero ventanillas', n_ventanillas
+        ! Buscar ventanillas disponibles
+        do i = 1, num_clientes_aleatorios
+            call cliente_aleatorio()
+        end do
+        
+        do i = 1, n_ventanillas
+            if (lista_ventanillas%tiene_cola(i)) then
+                print *, 'Ventanilla', i, 'tiene cola'
+            else
+                print *, 'Ventanilla', i, 'no tiene cola'
+            end if
+        end do
+        
+        call cola_recepcion%print()
+        call lista_ventanillas%print()
+    end subroutine ejecutar_paso
+
+
+    subroutine cliente_aleatorio
+        call random_number(rnd1)
+        call random_number(rnd2)
+        call random_number(rnd3)
+        call random_number(rnd4)
+        k = 1 + mod(int(rnd1(1) * 1000), num_nombres)
+        j = 1 + mod(int(rnd2(1) * 1000), num_apellidos)
+        new_img_g = mod(int(rnd3(1) * 1000), 5)
+        new_img_p = mod(int(rnd4(1) * 1000), 5)
+        ! Compose the full name
+        write(nombre_completo, '(A," ",A)') trim(nombres(k)), trim(apellidos(j))
+    
+        ! Display the generated full name
+        print *, 'Nombre generado:', nombre_completo
+
+        num_pasadas = num_pasadas + 1
+        call cola_recepcion%push(num_pasadas, nombre_completo, new_img_g, new_img_p)
+        call cola_recepcion%print()
+        
+    end subroutine cliente_aleatorio
+    
 
   subroutine estado_memoria()
       print *, 'Ha seleccionado Estado en memoria de las estructuras'

@@ -5,6 +5,7 @@ module cola_recepcion_m
     type :: node
         private
         integer :: id
+        character(len=100) :: nombre
         integer :: img_g
         integer :: img_p
         type(node), pointer :: next => null()
@@ -14,17 +15,33 @@ module cola_recepcion_m
         private
         type(node), pointer :: head => null()
 
+        
+
     contains
         procedure :: push
         procedure :: append
         procedure :: pop
         procedure :: clear
+        procedure :: esta_vacia
         ! procedure :: insert
         procedure :: print
         final :: destructor
+
     end type cola_r
 
 contains
+
+
+
+
+function esta_vacia(self) result(is_empty)
+    class(cola_r), intent(in) :: self
+    logical :: is_empty
+
+    is_empty = .not. associated(self%head)
+end function esta_vacia
+
+    
     subroutine clear(self)
         class(cola_r), intent(inout) :: self
         type(node), pointer :: current
@@ -53,14 +70,15 @@ contains
         end if
     end subroutine pop
 
-    subroutine push(self, id, img_g, img_p)
+    subroutine push(self, id, nombre, img_g, img_p)
         class(cola_r), intent(inout) :: self
         integer, intent(in) :: id, img_g, img_p
-
+        character(len=*), intent(in) :: nombre
         type(node), pointer :: new
         allocate(new)
 
         new%id = id
+        new%nombre = nombre
         new%img_p = img_g
         new%img_g = img_p
 
@@ -103,7 +121,7 @@ contains
         current => self%head
 
         do while(associated(current))
-            print *, "ID:", current%id, ", img_g:", current%img_g, ", img_p:", current%img_p
+            print *, "ID:", current%id, "Nombre:", current%nombre, ", img_g:", current%img_g, ", img_p:", current%img_p
             current => current%next
         end do
     end subroutine print
