@@ -22,7 +22,11 @@ module cola_recepcion_m
         procedure :: append
         procedure :: pop
         procedure :: clear
+        procedure :: vaciar
         procedure :: esta_vacia
+        procedure :: toma_id
+        procedure :: toma_img_g
+        procedure :: toma_img_p
         ! procedure :: insert
         procedure :: print
         final :: destructor
@@ -32,13 +36,54 @@ module cola_recepcion_m
 contains
 
 
+function toma_id(self) result(id)
+    class(cola_r), intent(inout) :: self
+    type(node), pointer :: current
+    integer ::id
+    current => self%head
+    id = current%id
+end function toma_id
 
+function toma_img_g(self) result(img_g)
+    class(cola_r), intent(inout) :: self
+    type(node), pointer :: current
+    integer ::img_g
+    current => self%head
+    img_g = current%img_g
+end function toma_img_g
+
+function toma_img_p(self) result(img_p)
+    class(cola_r), intent(inout) :: self
+    type(node), pointer :: current
+    integer ::img_p
+    current => self%head
+    img_p = current%img_p
+end function toma_img_p
+
+subroutine vaciar(self)
+    class(cola_r), intent(inout) :: self
+    type(node), pointer :: current
+    type(node), pointer :: temp
+
+    current => self%head
+    do while(associated(current))
+        temp => current%next
+        deallocate(current)
+        current => temp
+    end do
+    self%head => null() ! Asignar el puntero de la cabeza a nulo después de vaciar la lista
+end subroutine vaciar
 
 function esta_vacia(self) result(is_empty)
     class(cola_r), intent(in) :: self
     logical :: is_empty
+    ! busca si es 0 el id
+    if(self%head%id==0)then
+        is_empty= .false.
+    else
+        is_empty =.true.
+    end if  
 
-    is_empty = .not. associated(self%head)
 end function esta_vacia
 
     
@@ -58,37 +103,39 @@ end function esta_vacia
 
     subroutine pop(self)
         class(cola_r), intent(inout) :: self
+        type(node), pointer :: current
         type(node), pointer :: temp
 
-        if (.not. associated(self%head)) then
-            print *, "La lista está vacía. No se puede realizar 'pop'."
-            return
-        else
-            temp => self%head
-            self%head => self%head%next
-            deallocate(temp)
-        end if
+        current => self%head
+        temp => current%next
+        deallocate(current)
+        self%head => temp
     end subroutine pop
 
     subroutine push(self, id, nombre, img_g, img_p)
         class(cola_r), intent(inout) :: self
         integer, intent(in) :: id, img_g, img_p
         character(len=*), intent(in) :: nombre
-        type(node), pointer :: new
+        type(node), pointer :: new, current
+    
         allocate(new)
-
         new%id = id
         new%nombre = nombre
-        new%img_p = img_g
-        new%img_g = img_p
-
-        if(.not. associated(self%head)) then
+        new%img_p = img_p
+        new%img_g = img_g
+        new%next => null()
+    
+        if (.not. associated(self%head)) then
             self%head => new
-        else    
-            new%next => self%head
-            self%head => new
+        else
+            current => self%head
+            do while (associated(current%next))
+                current => current%next
+            end do
+            current%next => new
         end if
     end subroutine push
+    
 
     subroutine append(self, id, img_g, img_p)
         class(cola_r), intent(inout) :: self

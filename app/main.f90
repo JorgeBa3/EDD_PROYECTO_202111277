@@ -11,6 +11,7 @@ program main
     implicit none
 
     type(json_file) :: json
+    type(cliente) :: cliente_nuevo
     logical :: found
     integer :: id, img_g, img_p, num_pasadas, i, opcion, n_ventanillas, j,k 
     character(len=:),allocatable :: nombre, texto
@@ -18,6 +19,7 @@ program main
     type(lista_v) :: lista_ventanillas
     type(cola_r) :: cola_recepcion
     type(pila_i) :: pila_imagenes
+    
 
     !Clientes aleatorios
     integer :: new_img_p, new_img_g, num_clientes_aleatorios
@@ -165,13 +167,16 @@ end do
           print *, 'Ingrese la cantidad  de ventanillas:'
           read(*, *) n_ventanillas
           do i = 1, n_ventanillas
-              call lista_ventanillas%push(i)
+              call lista_ventanillas%nueva_ventanilla(i)
           end do
           call lista_ventanillas%print()
       end subroutine cantidad_ventanillas
 
 
     subroutine ejecutar_paso()
+
+        
+        integer :: nuevo_id, nuevo_img_g, nuevo_img_p
         print *, 'Ha seleccionado Ejecutar paso'
         call random_number(rnd5)
         num_clientes_aleatorios = mod(int(rnd5(1) * 1000), 4)
@@ -182,10 +187,20 @@ end do
         end do
         
         do i = 1, n_ventanillas
-            if (lista_ventanillas%tiene_cola(i)) then
-                print *, 'Ventanilla', i, 'tiene cola'
+            if (lista_ventanillas%tiene_cliente(i)) then
+                print *, 'Ventanilla', i, 'tiene cliente'
+                ! call lista_ventanillas%atender_cliente(i, cola_recepcion, pila_imagenes)
             else
-                print *, 'Ventanilla', i, 'no tiene cola'
+                print *, 'Ventanilla', i, 'no tiene cliente'
+                nuevo_id = cola_recepcion%toma_id()
+                nuevo_img_g = cola_recepcion%toma_img_g()
+                nuevo_img_p = cola_recepcion%toma_img_p()
+                call cliente_nuevo%crear_cliente(nuevo_id, nuevo_img_g, nuevo_img_p)
+                call lista_ventanillas%agregar_cliente(cliente_nuevo,i)
+                call cola_recepcion%pop()
+                exit !sale del samsara 
+                
+                
             end if
         end do
         
