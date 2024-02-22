@@ -153,7 +153,6 @@ subroutine agregar_cliente(self, cliente_nuevo, num_ventanilla)
         print *, "La ventanilla especificada no existe."
     end if
 end subroutine agregar_cliente
-
 subroutine atender_cliente(self)
     implicit none
     class(lista_v), intent(inout) :: self
@@ -173,14 +172,14 @@ subroutine atender_cliente(self)
                     current%datos_cliente%img_g = current%datos_cliente%img_g - 1
                     exit
                 elseif (current%datos_cliente%img_p > 0) then
-                    call current%stack%push('img_p') ! Agregar img_p a la pila de la ventanilla
+                    call current%stack%push('img_p') ! Agregar img_p a la pila de la ventanilla 
                     current%datos_cliente%img_p = current%datos_cliente%img_p - 1
                     exit
                 endif
             end do
         endif
         current => current%next
-    end do
+    end do 
 end subroutine atender_cliente
 
 

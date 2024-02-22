@@ -1,9 +1,6 @@
 program main
     use json_module
-    use doubly_linked_list_m
-    use Circular_linked_list_m
     use list_of_lists_m
-    use linked_list_m
     use lista_ventanillas_m
     use cola_recepcion_m
     use pila_img_m

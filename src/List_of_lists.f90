@@ -1,11 +1,11 @@
 module list_of_lists_m
-    use linked_list_m
+    use pila_img_m
     implicit none
     private
 
     type node
         integer :: index
-        type(linked_list) :: list
+        type(pila_i) :: pila
         type(node), pointer :: next => null()
         type(node), pointer :: prev => null()
     end type node
@@ -34,7 +34,7 @@ contains
             aux%index = index
             self%head => aux
             self%tail => aux
-            call aux%list%append(value)
+            call aux%pila%push(value)
         else
             if(index < self%head%index) then
                 self%head%prev => new
@@ -42,13 +42,13 @@ contains
                 self%head => new
 
                 new%index = index
-                call new%list%append(value)
+                call new%pila%push(value)
             else
                 aux => self%head
                 do while (associated(aux%next))
                     if(index < aux%next%index) then
                         if(index == aux%index) then
-                            call aux%list%append(value)
+                            call aux%pila%push(value)
                         else
                             new%next => aux%next
                             new%prev => aux
@@ -56,7 +56,7 @@ contains
                             aux%next => new
 
                             new%index = index
-                            call new%list%append(value)
+                            call new%pila%push(value)
                         end if
                         return
                     end if
@@ -64,14 +64,14 @@ contains
                 end do
 
                 if(index == aux%index) then
-                    call aux%list%append(value)
+                    call aux%pila%push(value)
                 else
                     self%tail%next => new
                     new%prev => self%tail
                     self%tail => new
 
                     new%index = index
-                    call new%list%append(value)
+                    call new%pila%push(value)
                 end if
             end if
         end if
@@ -85,7 +85,7 @@ contains
 
         do while(associated(aux))
             print *, 'índice: ', aux%index
-            call aux%list%print()
+            call aux%pila%print()
             print *, ""
             aux => aux%next
         end do
