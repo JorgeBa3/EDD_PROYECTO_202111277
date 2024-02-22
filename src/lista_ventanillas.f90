@@ -36,6 +36,7 @@ module lista_ventanillas_m
         procedure :: agregar_pila
         procedure :: limpiar_pila_cliente
         procedure :: print
+        procedure :: atender_cliente
         final :: destructor
     end type lista_v
 
@@ -153,6 +154,35 @@ subroutine agregar_cliente(self, cliente_nuevo, num_ventanilla)
     end if
 end subroutine agregar_cliente
 
+subroutine atender_cliente(self)
+    implicit none
+    class(lista_v), intent(inout) :: self
+    
+    type(node), pointer :: current
+    current => self%head
+    
+    ! Recorrer todas las ventanillas
+    do while (associated(current))
+        if (current%datos_cliente%id /= 0) then
+            ! Si la ventanilla tiene un cliente, procesarlo
+
+            ! Procesar las imágenes de img_g y img_p del cliente
+            do while (current%datos_cliente%img_g > 0 .or. current%datos_cliente%img_p > 0)
+                if (current%datos_cliente%img_g > 0) then
+                    call current%stack%push('img_g') ! Agregar img_g a la pila de la ventanilla
+                    current%datos_cliente%img_g = current%datos_cliente%img_g - 1
+                    exit
+                elseif (current%datos_cliente%img_p > 0) then
+                    call current%stack%push('img_p') ! Agregar img_p a la pila de la ventanilla
+                    current%datos_cliente%img_p = current%datos_cliente%img_p - 1
+                    exit
+                endif
+            end do
+        endif
+        current => current%next
+    end do
+end subroutine atender_cliente
+
 
 
     ! Método para agregar una imagen a la pila de la ventanilla
@@ -214,21 +244,20 @@ end subroutine agregar_cliente
 
     subroutine print(self)
         implicit none
-        type(pila_i) :: cola
         class(lista_v), intent(in) :: self
         type(node), pointer :: aux
-        if(associated(self%head)) then
+        if (associated(self%head)) then
             aux => self%head
-            do while(associated(aux))
-                print*, "Ventanilla: ", aux%num_ventanilla
-                print*, "Cliente: ", aux%datos_cliente%id, " Imagenes: ", aux%datos_cliente%img_g, " ", aux%datos_cliente%img_p
-                print*, "Imagenes: "
-                aux%stack=cola
-                call aux%stack%print()
+            do while (associated(aux))
+                print *, "Ventanilla: ", aux%num_ventanilla
+                print *, "Cliente: ", aux%datos_cliente%id, " Imagenes: ", aux%datos_cliente%img_g, " ", aux%datos_cliente%img_p
+                print *, "Imagenes: "
+                call aux%stack%print()  ! Imprimir la pila de la ventanilla actual
                 aux => aux%next
             end do
         end if
     end subroutine print
+    
 
     ! Destructor para liberar la memoria asignada a la lista de ventanillas
     subroutine destructor(self)

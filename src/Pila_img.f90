@@ -4,7 +4,7 @@ module pila_img_m
 
     type :: node
         private
-        character(len=100) :: tipo
+        character(len=5) :: tipo !img_p o img_g
         type(node), pointer :: next => null()
     end type node
 
@@ -47,7 +47,8 @@ contains
 
     subroutine push(self, tipo)
         class(pila_i), intent(inout) :: self
-        character(len=100) :: tipo
+        character(len=5) :: tipo
+
 
         type(node), pointer :: new
         allocate(new)

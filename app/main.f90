@@ -189,7 +189,7 @@ end do
         do i = 1, n_ventanillas
             if (lista_ventanillas%tiene_cliente(i)) then
                 print *, 'Ventanilla', i, 'tiene cliente'
-                ! call lista_ventanillas%atender_cliente(i, cola_recepcion, pila_imagenes)
+                
             else
                 print *, 'Ventanilla', i, 'no tiene cliente'
                 nuevo_id = cola_recepcion%toma_id()
@@ -203,7 +203,8 @@ end do
                 
             end if
         end do
-        
+        call lista_ventanillas%print()
+        call lista_ventanillas%atender_cliente()
         call cola_recepcion%print()
         call lista_ventanillas%print()
     end subroutine ejecutar_paso
