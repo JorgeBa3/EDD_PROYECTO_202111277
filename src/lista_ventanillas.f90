@@ -188,7 +188,7 @@ end subroutine atender_cliente
     subroutine agregar_pila(self, tipo)
         implicit none
         class(lista_v), intent(inout) :: self
-        character(len=100) :: tipo
+        character(len=40) :: tipo
         type(node), pointer :: aux
         if(associated(self%head)) then
             aux => self%head

@@ -5,7 +5,7 @@ module cola_recepcion_m
     type :: node
         private
         integer :: id
-        character(len=100) :: nombre
+        character(len=40) :: nombre
         integer :: img_g
         integer :: img_p
         type(node), pointer :: next => null()

@@ -3,16 +3,18 @@ program main
     use list_of_lists_m
     use lista_ventanillas_m
     use cola_recepcion_m
+    use cola_impresoras_m
     use pila_img_m
 
     implicit none
-
+    type(cola_imp) :: impresora_grande
+    type(cola_imp) :: impresora_pequena
     type(json_file) :: json
     type(cliente) :: cliente_nuevo
     logical :: found
     integer :: id, img_g, img_p, num_pasadas, i, opcion, n_ventanillas, j,k 
     character(len=:),allocatable :: nombre, texto
-    character(len=100) :: id_str, nombre_json, nombre_completo
+    character(len=40) :: id_str, nombre_json, nombre_completo
     type(lista_v) :: lista_ventanillas
     type(cola_r) :: cola_recepcion
     type(pila_i) :: pila_imagenes
@@ -26,8 +28,12 @@ real :: rnd1(1), rnd2(1), rnd3(1), rnd4(1), rnd5(1)
 character(len=40), dimension(num_nombres) :: nombres
 character(len=40), dimension(num_apellidos) :: apellidos
 integer :: values(8) ! Array para almacenar los valores de fecha y hora
-character(len=8) :: date_string, time_string ! Cadenas para almacenar la fecha y la hora
+character(len=8) :: date_string, time_string ! Cadenas para almacenar la fecha y la hora 
 
+
+!asignacion impresoras
+call impresora_grande%nueva_impresora(1, "Impresora Grande ")
+call impresora_pequena%nueva_impresora(2, "Impresora Pequena")
 ! Asignar nombres
 nombres = [ "Jorge ", "Jose  ", "Juan  ", "Maria ", "Carlos", "Luis  ", "Ana   " ]
 
@@ -38,7 +44,7 @@ apellidos = ["De Leon  ", "Batres   ", "Gonzalez ", "Lopez    ", "Martinez ", "P
 call date_and_time(values=values)
 
 ! Inicializar generador de números aleatorios con el tiempo actual
-call srand(seed=int(100*values(7))) ! Usamos los segundos como semilla
+call srand(seed=int(40*values(7))) ! Usamos los segundos como semilla
 call json%initialize()
 
 do
@@ -127,7 +133,7 @@ end do
 
   ! Obtener la cantidad de registros en el JSON
   num_pasadas = 0
-  do i = 1, 1000 ! Suponemos que hay como maximo 1000 registros para evitar bucles infinitos
+  do i = 1, 400 ! Suponemos que hay como maximo 400 registros para evitar bucles infinitos
     write(id_str, '(I10)') i  ! Convertir entero a cadena
     call json%get('['//trim(adjustl(id_str))//'].id', id, found)
     if (.not. found) exit ! Si no se encuentra el indice, salimos del bucle
@@ -157,17 +163,17 @@ end do
     call cola_recepcion%push(id, nombre, img_g, img_p)
     end do
     call cola_recepcion%print()
-      end subroutine carga_masiva_clientes
+    end subroutine carga_masiva_clientes
 
-      subroutine cantidad_ventanillas()
-          print *, 'Ha seleccionado Cantidad de ventanillas'
-          print *, 'Ingrese la cantidad  de ventanillas:'
-          read(*, *) n_ventanillas
-          do i = 1, n_ventanillas
-              call lista_ventanillas%nueva_ventanilla(i)
-          end do
-          call lista_ventanillas%print()
-      end subroutine cantidad_ventanillas
+    subroutine cantidad_ventanillas()
+         print *, 'Ha seleccionado Cantidad de ventanillas'
+        print *, 'Ingrese la cantidad  de ventanillas:'
+        read(*, *) n_ventanillas
+        do i = 1, n_ventanillas
+            call lista_ventanillas%nueva_ventanilla(i)
+        end do
+        call lista_ventanillas%print()
+    end subroutine cantidad_ventanillas
 
 
     subroutine ejecutar_paso()
@@ -176,7 +182,7 @@ end do
         integer :: nuevo_id, nuevo_img_g, nuevo_img_p
         print *, 'Ha seleccionado Ejecutar paso'
         call random_number(rnd5)
-        num_clientes_aleatorios = mod(int(rnd5(1) * 1000), 4)
+        num_clientes_aleatorios = mod(int(rnd5(1) * 400), 4)
         print *, 'Numero ventanillas', n_ventanillas
         ! Buscar ventanillas disponibles
         do i = 1, num_clientes_aleatorios
@@ -212,10 +218,10 @@ end do
         call random_number(rnd2)
         call random_number(rnd3)
         call random_number(rnd4)
-        k = 1 + mod(int(rnd1(1) * 1000), num_nombres)
-        j = 1 + mod(int(rnd2(1) * 1000), num_apellidos)
-        new_img_g = mod(int(rnd3(1) * 1000), 5)
-        new_img_p = mod(int(rnd4(1) * 1000), 5)
+        k = 1 + mod(int(rnd1(1) * 400), num_nombres)
+        j = 1 + mod(int(rnd2(1) * 400), num_apellidos)
+        new_img_g = mod(int(rnd3(1) * 400), 5)
+        new_img_p = mod(int(rnd4(1) * 400), 5)
         ! Compose the full name
         write(nombre_completo, '(A," ",A)') trim(nombres(k)), trim(apellidos(j))
     
@@ -229,18 +235,18 @@ end do
     end subroutine cliente_aleatorio
     
 
-  subroutine estado_memoria()
+    subroutine estado_memoria()
       print *, 'Ha seleccionado Estado en memoria de las estructuras'
-      ! Aqui puedes incluir el codigo para mostrar el estado en memoria
-  end subroutine estado_memoria
+    ! Aqui puedes incluir el codigo para mostrar el estado en memoria
+    end subroutine estado_memoria
 
-  subroutine generar_reportes()
+    subroutine generar_reportes()
       print *, 'Ha seleccionado Reportes'
-      ! Aqui puedes incluir el codigo para generar reportes
-  end subroutine generar_reportes
+    ! Aqui puedes incluir el codigo para generar reportes
+    end subroutine generar_reportes
 
-  subroutine acerca_de()
+    subroutine acerca_de()
       print *, 'Ha seleccionado Acerca de'
       print *, 'Jorge Alejandro De Leon Batres - 202111277'
-  end subroutine acerca_de
+    end subroutine acerca_de
 end program main
