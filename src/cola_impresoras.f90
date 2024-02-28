@@ -7,6 +7,7 @@ module cola_impresoras_m
         private
         integer :: id
         character(len=17) :: nombre
+        integer :: pasos_necesarios
         type(pila_i) :: stack
         type(node), pointer :: next => null() 
     end type node
@@ -18,24 +19,26 @@ module cola_impresoras_m
         
 
     contains
-        procedure :: push
+        procedure :: push_imp
         procedure :: nueva_impresora
-        procedure :: pop
-        procedure :: print
-        final :: destructor
+        procedure :: pop_imp
+        procedure :: print_imp
+        final :: destructor_imp
 
     end type cola_imp
 
 contains
-    subroutine nueva_impresora(self, id_impresora, nombre)
+    subroutine nueva_impresora(self, id_impresora, nombre, pasos)
         implicit none
         class(cola_imp), intent(inout) :: self
         integer, intent(in) :: id_impresora
+        integer, intent(in) :: pasos
         character(len=17) :: nombre
         type(node), pointer :: aux, nuevo
         allocate(nuevo)
         nuevo%id = id_impresora
         nuevo%nombre = nombre
+        nuevo%pasos_necesarios = pasos
         nuevo%next => null()
         if(associated(self%head)) then
             aux => self%head
@@ -48,7 +51,8 @@ contains
         end if
 
     end subroutine nueva_impresora
-    subroutine push(self, id, nombre, tipo_img)
+
+    subroutine push_imp(self, id, nombre, tipo_img)
         class(cola_imp), intent(inout) :: self
         integer :: id
         character(len=17) :: nombre
@@ -62,7 +66,7 @@ contains
         new_node%nombre = nombre
 
         ! Llamamos al procedimiento push de la pila para insertar el tipo de imagen
-        call new_node%stack%push(tipo_img)
+        call new_node%stack%push_i(tipo_img, id)
 
         if (.not. associated(self%head)) then
             self%head => new_node
@@ -73,9 +77,9 @@ contains
             end do
             current%next => new_node
         end if
-    end subroutine push
+    end subroutine push_imp
 
-    subroutine pop(self)
+    subroutine pop_imp(self)
         class(cola_imp), intent(inout) :: self
         type(node), pointer :: temp
 
@@ -87,9 +91,9 @@ contains
             self%head => self%head%next
             deallocate(temp)
         end if
-    end subroutine pop
+    end subroutine pop_imp
 
-    subroutine print(self)
+    subroutine print_imp(self)
         class(cola_imp), intent(in) :: self
         type(node), pointer :: current
         current => self%head
@@ -98,12 +102,12 @@ contains
         do while (associated(current))
             print *, "ID:", current%id, "Nombre:", current%nombre
             ! Llamamos al procedimiento print de la pila para mostrar el tipo de imagen
-            call current%stack%print()
+            call current%stack%print_i()
             current => current%next
         end do
-    end subroutine print
+    end subroutine print_imp
 
-    subroutine destructor(self)
+    subroutine destructor_imp(self)
         type(cola_imp), intent(inout) :: self
         type(node), pointer :: aux
 
@@ -112,6 +116,6 @@ contains
             deallocate(self%head)
             self%head => aux
         end do
-    end subroutine destructor
+    end subroutine destructor_imp
 
 end module cola_impresoras_m

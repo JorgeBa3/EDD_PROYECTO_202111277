@@ -35,9 +35,9 @@ module lista_ventanillas_m
         procedure :: agregar_cliente
         procedure :: agregar_pila
         procedure :: limpiar_pila_cliente
-        procedure :: print
+        procedure :: print_ven
         procedure :: atender_cliente
-        final :: destructor
+        final :: destructor_ven
     end type lista_v
 
 contains
@@ -168,15 +168,16 @@ subroutine atender_cliente(self)
             ! Procesar las imágenes de img_g y img_p del cliente
             do while (current%datos_cliente%img_g > 0 .or. current%datos_cliente%img_p > 0)
                 if (current%datos_cliente%img_g > 0) then
-                    call current%stack%push('img_g') ! Agregar img_g a la pila de la ventanilla
+                    call current%stack%push_i('img_g', current%datos_cliente%id) ! Agregar img_g a la pila de la ventanilla
                     current%datos_cliente%img_g = current%datos_cliente%img_g - 1
                     exit
                 elseif (current%datos_cliente%img_p > 0) then
-                    call current%stack%push('img_p') ! Agregar img_p a la pila de la ventanilla 
+                    call current%stack%push_i('img_p', current%datos_cliente%id) ! Agregar img_p a la pila de la ventanilla 
                     current%datos_cliente%img_p = current%datos_cliente%img_p - 1
                     exit
                 endif
             end do
+            
         endif
         current => current%next
     end do 
@@ -188,12 +189,13 @@ end subroutine atender_cliente
     subroutine agregar_pila(self, tipo)
         implicit none
         class(lista_v), intent(inout) :: self
+        type(node), pointer :: current
         character(len=40) :: tipo
         type(node), pointer :: aux
         if(associated(self%head)) then
             aux => self%head
             do while(associated(aux))
-                call aux%stack%push(tipo)   ! Agregar la imagen a la pila utilizando el nuevo método
+                call aux%stack%push_i(tipo, current%datos_cliente%id)   ! Agregar la imagen a la pila utilizando el nuevo método
                 aux => aux%next
             end do
         end if
@@ -230,7 +232,7 @@ end subroutine atender_cliente
         if(associated(self%head)) then
             aux => self%head
             do while(associated(aux))
-                call aux%stack%vaciar()   ! Vaciar la pila utilizando el nuevo método
+                call aux%stack%vaciar_i()   ! Vaciar la pila utilizando el nuevo método
                 print*, "Ventanilla:", aux%num_ventanilla
                 aux => aux%next
             end do
@@ -241,7 +243,7 @@ end subroutine atender_cliente
     ! Método para imprimir información sobre la ventanilla
 
 
-    subroutine print(self)
+    subroutine print_ven(self)
         implicit none
         class(lista_v), intent(in) :: self
         type(node), pointer :: aux
@@ -251,15 +253,15 @@ end subroutine atender_cliente
                 print *, "Ventanilla: ", aux%num_ventanilla
                 print *, "Cliente: ", aux%datos_cliente%id, " Imagenes: ", aux%datos_cliente%img_g, " ", aux%datos_cliente%img_p
                 print *, "Imagenes: "
-                call aux%stack%print()  ! Imprimir la pila de la ventanilla actual
+                call aux%stack%print_i()  ! Imprimir la pila de la ventanilla actual
                 aux => aux%next
             end do
         end if
-    end subroutine print
+    end subroutine print_ven
     
 
-    ! Destructor para liberar la memoria asignada a la lista de ventanillas
-    subroutine destructor(self)
+    ! destructor_ven para liberar la memoria asignada a la lista de ventanillas
+    subroutine destructor_ven(self)
         type(lista_v), intent(inout) :: self
         type(node), pointer :: aux
 
@@ -268,7 +270,7 @@ end subroutine atender_cliente
             deallocate(self%head)
             self%head => aux
         end do
-    end subroutine destructor
+    end subroutine destructor_ven
 
 end module lista_ventanillas_m
 !smsmsmm

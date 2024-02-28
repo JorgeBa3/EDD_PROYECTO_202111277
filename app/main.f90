@@ -1,6 +1,5 @@
 program main
     use json_module
-    use list_of_lists_m
     use lista_ventanillas_m
     use cola_recepcion_m
     use cola_impresoras_m
@@ -28,12 +27,12 @@ real :: rnd1(1), rnd2(1), rnd3(1), rnd4(1), rnd5(1)
 character(len=40), dimension(num_nombres) :: nombres
 character(len=40), dimension(num_apellidos) :: apellidos
 integer :: values(8) ! Array para almacenar los valores de fecha y hora
-character(len=8) :: date_string, time_string ! Cadenas para almacenar la fecha y la hora 
+character(len=8) :: date_string, time_string ! Cadenas para almacenar la fecha y la hora  
 
 
 !asignacion impresoras
-call impresora_grande%nueva_impresora(1, "Impresora Grande ")
-call impresora_pequena%nueva_impresora(2, "Impresora Pequena")
+call impresora_grande%nueva_impresora(1, "Impresora Grande ", 2)
+call impresora_pequena%nueva_impresora(2, "Impresora Pequena", 1)
 ! Asignar nombres
 nombres = [ "Jorge ", "Jose  ", "Juan  ", "Maria ", "Carlos", "Luis  ", "Ana   " ]
 
@@ -69,18 +68,16 @@ do
     end select
 end do
 
-  
-
-  ! Limpiar
-  call json%destroy()
-  if (json%failed()) stop 4
+! Limpiar
+call json%destroy()
+if (json%failed()) stop 4
 
 
 
 
-  contains
+contains
 
-  subroutine mostrar_menu_principal()
+subroutine mostrar_menu_principal()
       print *, '--- Menu ---'
       print *, '1. Parametros iniciales'
       print *, '2. Ejecutar paso'
@@ -89,62 +86,61 @@ end do
       print *, '5. Acerca de'
       print *, '6. Salir'
       print *, 'Ingrese su opcion:'
-  end subroutine mostrar_menu_principal
+end subroutine mostrar_menu_principal
 
-  subroutine submenu_parametros()
-      implicit none
-      integer :: opcion_parametros
+subroutine submenu_parametros()
+    implicit none
+    integer :: opcion_parametros
 
-      do
-          call mostrar_submenu_parametros()
-          read(*,*) opcion_parametros
+    do
+        call mostrar_submenu_parametros()
+        read(*,*) opcion_parametros
 
-          select case(opcion_parametros)
-              case(1)
-                  call carga_masiva_clientes()
-              case(2)
-                  call cantidad_ventanillas()
-              case(3)
-                  exit
-              case default
+        select case(opcion_parametros)
+            case(1)
+                call carga_masiva_clientes()
+            case(2)
+                call cantidad_ventanillas()
+            case(3)
+                exit
+            case default
                   print *, 'Opcion no valida. Por favor, seleccione una opcion valida.'
-          end select
-      end do
-  end subroutine submenu_parametros
-  
+        end select
+    end do
+end subroutine submenu_parametros
 
-      subroutine mostrar_submenu_parametros()
+    subroutine mostrar_submenu_parametros()
           print *, '--- Parametros iniciales ---'
           print *, '1. Carga masiva de clientes'
           print *, '2. Cantidad de ventanillas'
           print *, '3. Volver al menu principal'
           print *, 'Ingrese su opcion:'
-      end subroutine mostrar_submenu_parametros
+    end subroutine mostrar_submenu_parametros
 
-      subroutine carga_masiva_clientes()
+    subroutine carga_masiva_clientes()
           print *, 'Ha seleccionado Carga masiva de clientes'
-          ! read the file
-  print *, 'Ingrese el nombre del  archivo JSON:'
-  read(*, '(A)') nombre_json
-  call json%load(filename = nombre_json)
+        ! read the file
+    print *, 'Ingrese el nombre del  archivo JSON:'
+    read(*, '(A)') nombre_json
+call json%load(filename = nombre_json)
 
-  ! print the file to the console
-  call json%print()
+! print the file to the console
+call json%print()
 
-  ! Obtener la cantidad de registros en el JSON
-  num_pasadas = 0
-  do i = 1, 400 ! Suponemos que hay como maximo 400 registros para evitar bucles infinitos
+! Obtener la cantidad de registros en el JSON
+num_pasadas = 0
+do i = 1, 400 ! Suponemos que hay como maximo 400 registros para evitar bucles infinitos
     write(id_str, '(I10)') i  ! Convertir entero a cadena
     call json%get('['//trim(adjustl(id_str))//'].id', id, found)
     if (.not. found) exit ! Si no se encuentra el indice, salimos del bucle
     num_pasadas = num_pasadas + 1
-  end do
+end do
 
-  ! Imprimir la cantidad de registros
-  print *, 'Cantidad de registros:', num_pasadas
+! Imprimir la cantidad de registros
+print *, 'Cantidad de registros:', num_pasadas
 
- ! Realizar el bucle desde 1 hasta num_pasadas
-  do i = 1, num_pasadas
+! Realizar el bucle desde 1 hasta num_pasadas
+do i = 1, num_pasadas
     write(id_str, '(I10)') i  ! Convert integer to string
     call json%get('['//trim(adjustl(id_str))//'].id', id, found)
     if (.not. found) stop 11
@@ -172,7 +168,7 @@ end do
         do i = 1, n_ventanillas
             call lista_ventanillas%nueva_ventanilla(i)
         end do
-        call lista_ventanillas%print()
+        call lista_ventanillas%print_ven()
     end subroutine cantidad_ventanillas
 
 
@@ -206,10 +202,10 @@ end do
                 
             end if
         end do
-        call lista_ventanillas%print()
+        call lista_ventanillas%print_ven()
         call lista_ventanillas%atender_cliente()
         call cola_recepcion%print()
-        call lista_ventanillas%print()
+        call lista_ventanillas%print_ven()
     end subroutine ejecutar_paso
 
 
