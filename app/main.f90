@@ -177,6 +177,8 @@ do i = 1, num_pasadas
         
         integer :: nuevo_id, nuevo_img_g, nuevo_img_p
         print *, 'Ha seleccionado Ejecutar paso'
+        WRITE(*, '(A, I0, A)') ' ------------------------ Paso ', num_paso, ' ------------------------'
+        num_paso = num_paso + 1
         call random_number(rnd5)
         num_clientes_aleatorios = mod(int(rnd5(1) * 400), 4)
         print *, 'Numero ventanillas', n_ventanillas
@@ -202,8 +204,6 @@ do i = 1, num_pasadas
                 
             end if
         end do
-        WRITE(*, '(A, I0, A)') ' ------------------------ Paso ', num_paso, ' ------------------------'
-        num_paso = num_paso + 1
         call lista_ventanillas%atender_cliente()
         call cola_recepcion%print()
         call lista_ventanillas%print_ven()
@@ -227,7 +227,7 @@ do i = 1, num_pasadas
 
         num_pasadas = num_pasadas + 1
         call cola_recepcion%push(num_pasadas, nombre_completo, new_img_g, new_img_p)
-        call cola_recepcion%print()
+        
         
     end subroutine cliente_aleatorio
     
