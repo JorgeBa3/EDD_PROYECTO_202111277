@@ -28,7 +28,6 @@ module lista_ventanillas_m
         type(node), pointer :: head => null()
     contains
         procedure :: tiene_cliente
-        
         procedure :: toma_id
         procedure :: graficar_ventanilla
         procedure :: toma_img_g
@@ -209,11 +208,6 @@ logical function tiene_cliente(self, ventanilla)
     end do
 
 end function tiene_cliente
-
-
-
-
-
 
 subroutine agregar_cliente(self, cliente_nuevo, num_ventanilla)
     implicit none
