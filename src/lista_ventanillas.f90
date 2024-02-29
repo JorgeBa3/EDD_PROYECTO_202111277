@@ -28,7 +28,9 @@ module lista_ventanillas_m
         type(node), pointer :: head => null()
     contains
         procedure :: tiene_cliente
+        
         procedure :: toma_id
+        procedure :: graficar_ventanilla
         procedure :: toma_img_g
         procedure :: toma_img_p
         procedure :: nueva_ventanilla
@@ -37,10 +39,97 @@ module lista_ventanillas_m
         procedure :: limpiar_pila_cliente
         procedure :: print_ven
         procedure :: atender_cliente
+        
         final :: destructor_ven
     end type lista_v
 
 contains
+function itoa(number) result(str)
+    integer, intent(in) :: number
+    character(len=14) :: str
+
+    ! Convierte el entero a una cadena de caracteres
+    write(str, '(I14)') number
+
+end function itoa
+
+
+subroutine graficar_ventanilla(self, nombre_archivo)
+    implicit none
+    class(lista_v), intent(in) :: self
+    character(len=*), intent(in) :: nombre_archivo
+    integer :: io
+
+    integer :: index
+    character(len=100), allocatable :: command
+    character(:), allocatable :: connections
+    character(:), allocatable :: firsts
+    character(len=8) :: name
+    type(node), pointer :: current
+
+    current => self%head
+    command = "dot -Tpng " // trim(nombre_archivo) // " -o " // trim(nombre_archivo) // ".png"
+    io = 1
+    index = 0
+
+    connections = ""
+    firsts = ""
+
+    open(newunit=io, file=trim(nombre_archivo))
+    write(io, *) "digraph ListaVentanillas {"
+    write(io, *) "  rankdir=LR;"
+
+    if (associated(self%head)) then
+        do while (associated(current))
+            write(name, '(I5)') current%num_ventanilla
+
+            if (firsts == "") then
+                firsts = trim(name)
+            end if
+
+            ! Generar etiqueta para el nodo del cliente
+            write(io, '(A)') '"cliente' // trim(name) // '"[label="Cliente: ' // &
+                merge(trim(itoa(current%datos_cliente%id)), "No hay cliente", current%datos_cliente%id /= 0) // &
+                ', Img_g: ' // trim(itoa(current%datos_cliente%img_g)) // &
+                ', Img_p: ' // trim(itoa(current%datos_cliente%img_p)) // &
+                '", shape=box];'
+
+            ! Generar etiqueta para el nodo de la ventana
+            write(io, '(A)') '"nodo' // trim(name) // '"[label="Ventanilla: ' // trim(name) // '", shape=box];'
+
+            ! Generar conexión entre el cliente y la ventana
+            connections = connections // '"cliente' // trim(name) // '" -> ' // '"nodo' // trim(name) // '";'
+
+! Generar etiqueta para el nodo de la pila de ventanilla
+! Obtener los elementos de la pila de la ventanilla actual
+            write(io, '(A)') '"pila' // trim(name) // '"[label="Pila de Ventanilla ' // trim(name) // &
+            '& : ' // trim(current%stack%get_elements()) // '", shape=box];'
+        
+        ! Generar conexión entre la ventana y la pila
+        connections = connections // '"nodo' // trim(name) // '" -> ' // '"pila' // trim(name) // '";'
+        
+
+
+            current => current%next
+            index = index + 1
+        end do
+    end if
+
+    write(io, *) connections
+    write(io, *) "}"
+    close(io)
+
+    call execute_command_line(command, exitstat=io)
+
+    if (io /= 0) then
+        print *, "Ocurrió un error al generar la imagen."
+    else
+        print *, "Imagen generada satisfactoriamente."
+    end if
+end subroutine graficar_ventanilla
+
+
+
 
 
     integer function toma_id(self, ventanilla)
@@ -142,6 +231,7 @@ subroutine agregar_cliente(self, cliente_nuevo, num_ventanilla)
         if (current%num_ventanilla == num_ventanilla) then
             found = .true.
             current%datos_cliente = cliente_nuevo
+            print *, "Cliente", cliente_nuevo%id, "agregado a la ventanilla:", num_ventanilla
             exit
         else
             current => current%next
@@ -170,10 +260,12 @@ subroutine atender_cliente(self)
                 if (current%datos_cliente%img_g > 0) then
                     call current%stack%push_i('img_g', current%datos_cliente%id) ! Agregar img_g a la pila de la ventanilla
                     current%datos_cliente%img_g = current%datos_cliente%img_g - 1
+                    print *, "Ventanilla:", current%num_ventanilla, "recibió una imagen grande"
                     exit
                 elseif (current%datos_cliente%img_p > 0) then
                     call current%stack%push_i('img_p', current%datos_cliente%id) ! Agregar img_p a la pila de la ventanilla 
                     current%datos_cliente%img_p = current%datos_cliente%img_p - 1
+                    print *, "Ventanilla:", current%num_ventanilla, "recibió una imagen pequeña"
                     exit
                 endif
             end do

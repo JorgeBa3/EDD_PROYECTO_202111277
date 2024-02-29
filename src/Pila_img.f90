@@ -2,7 +2,7 @@ module pila_img_m
     implicit none
     private
 
-    type :: node
+    type :: node 
         private
         integer :: id !id del cliente
         character(len=5) :: tipo !img_p o img_g
@@ -15,13 +15,49 @@ module pila_img_m
 
     contains
         procedure :: push_i
+        procedure :: get_elements
         procedure :: vaciar_i
         procedure :: pop_i
         procedure :: print_i
         final :: destructor_i
+        ! Método para obtener la cabeza de la pila
+        procedure :: get_head
     end type pila_i
 
 contains
+
+subroutine get_head(self, head)
+    class(pila_i), intent(in) :: self
+    type(node), pointer :: head
+    
+    head => self%head
+end subroutine get_head
+function get_elements(self) result(elements)
+    class(pila_i), intent(in) :: self
+    character(len=:), allocatable :: elements
+    type(node), pointer :: current
+
+    elements = '' ! Inicializar la cadena de elementos
+
+    current => self%head
+
+    ! Recorrer la pila y construir la cadena de elementos
+    do while (associated(current))
+        elements = elements // current%tipo // ', '  !Agregar el tipo de imagen
+        current => current%next
+    end do
+
+    ! Eliminar la última coma y el espacio en blanco
+    if (len_trim(elements) > 0) then
+        elements = elements(1:len(elements)-2)
+    endif
+
+    ! Devolver la cadena de elementos
+    return
+end function get_elements
+
+
+
     subroutine vaciar_i(self)
         class(pila_i), intent(inout) :: self
         type(node), pointer :: aux

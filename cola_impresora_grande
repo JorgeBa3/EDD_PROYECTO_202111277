@@ -1,0 +1,4 @@
+ digraph ColaImpresoras {
+   rankdir=LR;
+ "Impresora Grande"
+ }

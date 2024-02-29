@@ -20,6 +20,7 @@ module cola_impresoras_m
 
     contains
         procedure :: push_imp
+        procedure :: generar_grafo_cola_imp 
         procedure :: nueva_impresora
         procedure :: pop_imp
         procedure :: print_imp
@@ -28,6 +29,65 @@ module cola_impresoras_m
     end type cola_imp
 
 contains
+
+subroutine generar_grafo_cola_imp(self, nombre_archivo)
+    implicit none
+    class(cola_imp), intent(in) :: self
+    character(len=*), intent(in) :: nombre_archivo
+    integer :: io
+
+    integer :: index
+    character(len=100), allocatable :: command
+    character(:), allocatable :: connections
+    character(:), allocatable :: firsts
+    character(len=8) :: name
+    type(node), pointer :: current
+
+    current => self%head
+    command = "dot -Tpng " // trim(nombre_archivo) // " -o " // trim(nombre_archivo) // ".png"
+    io = 1
+    index = 0
+
+    connections = ""
+    firsts = ""
+
+    open(newunit=io, file=trim(nombre_archivo))
+    write(io, *) "digraph ColaImpresoras {"
+    write(io, *) "  rankdir=LR;"
+
+    if(associated(self%head)) then
+        do while(associated(current))
+            write(name, '(I5)') current%id
+
+            if(firsts == "") then
+                firsts = trim(name)
+            end if
+
+            if(.not. associated(current%next)) then
+                connections = connections // '"' // trim(current%nombre) // '"'
+                exit
+            end if
+            
+            write(io, *) '"nodo' // trim(name) // '" [label="ID: ' // trim(name) // '\nNombre: ' // trim(current%nombre) // '"];'
+            connections = connections // '"nodo' // trim(name) // '" -> '
+            current => current%next
+            index = index + 1
+        end do
+    end if
+
+    write(io, *) connections
+    write(io, *) "}"
+    close(io)
+
+    call execute_command_line(command, exitstat=io)
+
+    if(io /= 0) then
+        print *, "Ocurrió un error al generar la imagen."
+    else
+        print *, "Imagen generada satisfactoriamente."
+    end if
+end subroutine generar_grafo_cola_imp
+
     subroutine nueva_impresora(self, id_impresora, nombre, pasos)
         implicit none
         class(cola_imp), intent(inout) :: self

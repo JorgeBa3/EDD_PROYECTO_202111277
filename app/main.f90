@@ -11,7 +11,7 @@ program main
     type(json_file) :: json
     type(cliente) :: cliente_nuevo
     logical :: found
-    integer :: id, img_g, img_p, num_pasadas, i, opcion, n_ventanillas, j,k 
+    integer :: id, img_g, img_p, num_pasadas, i, opcion, n_ventanillas, j,k, num_paso
     character(len=:),allocatable :: nombre, texto
     character(len=40) :: id_str, nombre_json, nombre_completo
     type(lista_v) :: lista_ventanillas
@@ -38,7 +38,7 @@ nombres = [ "Jorge ", "Jose  ", "Juan  ", "Maria ", "Carlos", "Luis  ", "Ana   "
 
 ! Asignar apellidos
 apellidos = ["De Leon  ", "Batres   ", "Gonzalez ", "Lopez    ", "Martinez ", "Perez    ", "Sanchez  " ]
-
+num_paso = 1
 ! Llamar a date_and_time para obtener la fecha y la hora actual
 call date_and_time(values=values)
 
@@ -202,7 +202,8 @@ do i = 1, num_pasadas
                 
             end if
         end do
-        call lista_ventanillas%print_ven()
+        WRITE(*, '(A, I0, A)') ' ------------------------ Paso ', num_paso, ' ------------------------'
+        num_paso = num_paso + 1
         call lista_ventanillas%atender_cliente()
         call cola_recepcion%print()
         call lista_ventanillas%print_ven()
@@ -232,8 +233,12 @@ do i = 1, num_pasadas
     
 
     subroutine estado_memoria()
-      print *, 'Ha seleccionado Estado en memoria de las estructuras'
-    ! Aqui puedes incluir el codigo para mostrar el estado en memoria
+        print *, 'Ha seleccionado Estado en memoria de las estructuras'
+        
+        
+        call impresora_grande%generar_grafo_cola_imp("cola_impresora_grande")
+        call impresora_pequena%generar_grafo_cola_imp("cola_impresora_pequeña")
+        call lista_ventanillas%graficar_ventanilla("ventanillas")
     end subroutine estado_memoria
 
     subroutine generar_reportes()
