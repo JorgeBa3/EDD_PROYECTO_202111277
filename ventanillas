@@ -1,12 +1,12 @@
  digraph ListaVentanillas {
    rankdir=LR;
-"cliente    1"[label="Cliente:              1, Img_g:              1, Img_p:              2", shape=box];
+"cliente    1"[label="Cliente:              1, Img_g:              0, Img_p:              2", shape=box];
 "nodo    1"[label="Ventanilla:     1", shape=box];
 "pila    1"[label="Pila de Ventanilla     1& : img_g, img_g", shape=box];
-"cliente    2"[label="Cliente:              2, Img_g:              2, Img_p:              0", shape=box];
+"cliente    2"[label="Cliente:              2, Img_g:              0, Img_p:              3", shape=box];
 "nodo    2"[label="Ventanilla:     2", shape=box];
 "pila    2"[label="Pila de Ventanilla     2& : img_g", shape=box];
-"cliente    3"[label="Cliente: No hay cliente, Img_g:              0, Img_p:              0", shape=box];
+"cliente    3"[label="Cliente:              3, Img_g:              3, Img_p:              1", shape=box];
 "nodo    3"[label="Ventanilla:     3", shape=box];
 "pila    3"[label="Pila de Ventanilla     3& : ", shape=box];
  "cliente    1" -> "nodo    1";"nodo    1" -> "pila    1";"cliente    2" -> "nodo    2";"nodo    2" -> "pila    2";"cliente    3" -> "nodo    3";"nodo    3" -> "pila    3";

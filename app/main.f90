@@ -75,7 +75,7 @@ if (json%failed()) stop 4
 
 
 
-contains
+    contains
 
 subroutine mostrar_menu_principal()
       print *, '--- Menu ---'
@@ -196,6 +196,7 @@ do i = 1, num_pasadas
                 nuevo_id = cola_recepcion%toma_id()
                 nuevo_img_g = cola_recepcion%toma_img_g()
                 nuevo_img_p = cola_recepcion%toma_img_p()
+                call lista_ventanillas%atender_cliente()
                 call cliente_nuevo%crear_cliente(nuevo_id, nuevo_img_g, nuevo_img_p)
                 call lista_ventanillas%agregar_cliente(cliente_nuevo,i)
                 call cola_recepcion%pop()
@@ -204,7 +205,6 @@ do i = 1, num_pasadas
                 
             end if
         end do
-        call lista_ventanillas%atender_cliente()
         call cola_recepcion%print()
         call lista_ventanillas%print_ven()
     end subroutine ejecutar_paso
@@ -242,8 +242,10 @@ do i = 1, num_pasadas
     end subroutine estado_memoria
 
     subroutine generar_reportes()
-      print *, 'Ha seleccionado Reportes'
-    ! Aqui puedes incluir el codigo para generar reportes
+        print *, 'Ha seleccionado Reportes'
+        call cola_recepcion%print()
+        call cola_recepcion%mostrar_top5_img_g()
+        call cola_recepcion%mostrar_top5_img_p()
     end subroutine generar_reportes
 
     subroutine acerca_de()

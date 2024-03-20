@@ -1,0 +1,19 @@
+digraph G {
+rankdir=LR;
+node [shape=box];
+Top1                                                                                                23[label="ID: 23
+\nNombre: Jorge Lopez\nimg_g: 4"];
+Top2                                                                                                24[label="ID: 24
+\nNombre: Jose Sanchez\nimg_g: 0"];
+Top3                                                                                                25[label="ID: 25
+\nNombre: Maria Sanchez\nimg_g: 3"];
+Top4                                                                                                26[label="ID: 26
+\nNombre: Carlos Lopez\nimg_g: 0"];
+Top5                                                                                                27[label="ID: 27
+\nNombre: Luis Sanchez\nimg_g: 0"];
+Top1->23;
+Top2->24;
+Top3->25;
+Top4->26;
+Top5->27;
+}
