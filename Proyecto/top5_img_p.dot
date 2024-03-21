@@ -1,0 +1,19 @@
+digraph G {
+rankdir=LR;
+node [shape=box];
+Top1                                                                                                12[label="ID: 12
+\nNombre: Carlos Perez\nimg_p: 0"];
+Top2                                                                                                13[label="ID: 13
+\nNombre: Jose De Leon\nimg_p: 3"];
+Top3                                                                                                14[label="ID: 14
+\nNombre: Ana Perez\nimg_p: 3"];
+Top4                                                                                                15[label="ID: 15
+\nNombre: Ana Martinez\nimg_p: 2"];
+Top5                                                                                                16[label="ID: 16
+\nNombre: Ana Gonzalez\nimg_p: 0"];
+Top1->12;
+Top2->13;
+Top3->14;
+Top4->15;
+Top5->16;
+}

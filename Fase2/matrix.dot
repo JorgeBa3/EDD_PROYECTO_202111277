@@ -1,0 +1,184 @@
+ digraph Matrix {
+ node[shape = "box", width=0.5, height=0.5]
+ rankdir=LR
+ "Nodo0_0"[label = "root", group="0"]                                                                                                                  
+ "Nodo0_0"->"Nodo2_0"
+ "Nodo0_0"->"Nodo2_0"[dir = back]
+ "Nodo0_0"->"Nodo0_11"
+ "Nodo0_0"->"Nodo0_11"[dir = back]
+ "Nodo2_0"[label = "1", group="2"]                                                                                                                     
+ "Nodo2_0"->"Nodo3_0"
+ "Nodo2_0"->"Nodo3_0"[dir = back]
+ "Nodo2_0"->"Nodo2_15"
+ "Nodo2_0"->"Nodo2_15"[dir = back]
+ "Nodo3_0"[label = "2", group="3"]                                                                                                                     
+ "Nodo3_0"->"Nodo4_0"
+ "Nodo3_0"->"Nodo4_0"[dir = back]
+ "Nodo3_0"->"Nodo3_15"
+ "Nodo3_0"->"Nodo3_15"[dir = back]
+ "Nodo4_0"[label = "3", group="4"]                                                                                                                     
+ "Nodo4_0"->"Nodo5_0"
+ "Nodo4_0"->"Nodo5_0"[dir = back]
+ "Nodo4_0"->"Nodo4_16"
+ "Nodo4_0"->"Nodo4_16"[dir = back]
+ "Nodo5_0"[label = "4", group="5"]                                                                                                                     
+ "Nodo5_0"->"Nodo6_0"
+ "Nodo5_0"->"Nodo6_0"[dir = back]
+ "Nodo5_0"->"Nodo5_15"
+ "Nodo5_0"->"Nodo5_15"[dir = back]
+ "Nodo6_0"[label = "5", group="6"]                                                                                                                     
+ "Nodo6_0"->"Nodo6_11"
+ "Nodo6_0"->"Nodo6_11"[dir = back]
+ {rank=same;"Nodo0_0";"Nodo2_0";"Nodo3_0";"Nodo4_0";"Nodo5_0";"Nodo6_0"}
+ "Nodo0_11"[label = "10", group="0"]                                                                                                                   
+ "Nodo0_11"->"Nodo6_11"
+ "Nodo0_11"->"Nodo6_11"[dir = back]
+ "Nodo0_11"->"Nodo0_12"
+ "Nodo0_11"->"Nodo0_12"[dir = back]
+ "Nodo6_11"[style="filled", fillcolor="#000000", fontsize=1, group="6"]                                                                                
+ "Nodo6_11"->"Nodo6_12"
+ "Nodo6_11"->"Nodo6_12"[dir = back]
+ {rank=same;"Nodo0_11";"Nodo6_11"}
+ "Nodo0_12"[label = "11", group="0"]                                                                                                                   
+ "Nodo0_12"->"Nodo6_12"
+ "Nodo0_12"->"Nodo6_12"[dir = back]
+ "Nodo0_12"->"Nodo0_15"
+ "Nodo0_12"->"Nodo0_15"[dir = back]
+ "Nodo6_12"[style="filled", fillcolor="#000000", fontsize=1, group="6"]                                                                                
+ "Nodo6_12"->"Nodo6_17"
+ "Nodo6_12"->"Nodo6_17"[dir = back]
+ {rank=same;"Nodo0_12";"Nodo6_12"}
+ "Nodo0_15"[label = "14", group="0"]                                                                                                                   
+ "Nodo0_15"->"Nodo2_15"
+ "Nodo0_15"->"Nodo2_15"[dir = back]
+ "Nodo0_15"->"Nodo0_16"
+ "Nodo0_15"->"Nodo0_16"[dir = back]
+ "Nodo2_15"[style="filled", fillcolor="#000000", fontsize=1, group="2"]                                                                                
+ "Nodo2_15"->"Nodo3_15"
+ "Nodo2_15"->"Nodo3_15"[dir = back]
+ "Nodo2_15"->"Nodo2_16"
+ "Nodo2_15"->"Nodo2_16"[dir = back]
+ "Nodo3_15"[style="filled", fillcolor="#000000", fontsize=1, group="3"]                                                                                
+ "Nodo3_15"->"Nodo5_15"
+ "Nodo3_15"->"Nodo5_15"[dir = back]
+ "Nodo3_15"->"Nodo3_19"
+ "Nodo3_15"->"Nodo3_19"[dir = back]
+ "Nodo5_15"[style="filled", fillcolor="#000000", fontsize=1, group="5"]                                                                                
+ "Nodo5_15"->"Nodo5_16"
+ "Nodo5_15"->"Nodo5_16"[dir = back]
+ {rank=same;"Nodo0_15";"Nodo2_15";"Nodo3_15";"Nodo5_15"}
+ "Nodo0_16"[label = "15", group="0"]                                                                                                                   
+ "Nodo0_16"->"Nodo2_16"
+ "Nodo0_16"->"Nodo2_16"[dir = back]
+ "Nodo0_16"->"Nodo0_17"
+ "Nodo0_16"->"Nodo0_17"[dir = back]
+ "Nodo2_16"[style="filled", fillcolor="#000000", fontsize=1, group="2"]                                                                                
+ "Nodo2_16"->"Nodo4_16"
+ "Nodo2_16"->"Nodo4_16"[dir = back]
+ "Nodo2_16"->"Nodo2_17"
+ "Nodo2_16"->"Nodo2_17"[dir = back]
+ "Nodo4_16"[style="filled", fillcolor="#000000", fontsize=1, group="4"]                                                                                
+ "Nodo4_16"->"Nodo5_16"
+ "Nodo4_16"->"Nodo5_16"[dir = back]
+ "Nodo4_16"->"Nodo4_21"
+ "Nodo4_16"->"Nodo4_21"[dir = back]
+ "Nodo5_16"[style="filled", fillcolor="#000000", fontsize=1, group="5"]                                                                                
+ "Nodo5_16"->"Nodo5_17"
+ "Nodo5_16"->"Nodo5_17"[dir = back]
+ {rank=same;"Nodo0_16";"Nodo2_16";"Nodo4_16";"Nodo5_16"}
+ "Nodo0_17"[label = "16", group="0"]                                                                                                                   
+ "Nodo0_17"->"Nodo2_17"
+ "Nodo0_17"->"Nodo2_17"[dir = back]
+ "Nodo0_17"->"Nodo0_18"
+ "Nodo0_17"->"Nodo0_18"[dir = back]
+ "Nodo2_17"[style="filled", fillcolor="#000000", fontsize=1, group="2"]                                                                                
+ "Nodo2_17"->"Nodo5_17"
+ "Nodo2_17"->"Nodo5_17"[dir = back]
+ "Nodo2_17"->"Nodo2_18"
+ "Nodo2_17"->"Nodo2_18"[dir = back]
+ "Nodo5_17"[style="filled", fillcolor="#000000", fontsize=1, group="5"]                                                                                
+ "Nodo5_17"->"Nodo6_17"
+ "Nodo5_17"->"Nodo6_17"[dir = back]
+ "Nodo5_17"->"Nodo5_18"
+ "Nodo5_17"->"Nodo5_18"[dir = back]
+ "Nodo6_17"[style="filled", fillcolor="#000000", fontsize=1, group="6"]                                                                                
+ "Nodo6_17"->"Nodo6_18"
+ "Nodo6_17"->"Nodo6_18"[dir = back]
+ {rank=same;"Nodo0_17";"Nodo2_17";"Nodo5_17";"Nodo6_17"}
+ "Nodo0_18"[label = "17", group="0"]                                                                                                                   
+ "Nodo0_18"->"Nodo2_18"
+ "Nodo0_18"->"Nodo2_18"[dir = back]
+ "Nodo0_18"->"Nodo0_19"
+ "Nodo0_18"->"Nodo0_19"[dir = back]
+ "Nodo2_18"[style="filled", fillcolor="#000000", fontsize=1, group="2"]                                                                                
+ "Nodo2_18"->"Nodo5_18"
+ "Nodo2_18"->"Nodo5_18"[dir = back]
+ "Nodo5_18"[style="filled", fillcolor="#000000", fontsize=1, group="5"]                                                                                
+ "Nodo5_18"->"Nodo6_18"
+ "Nodo5_18"->"Nodo6_18"[dir = back]
+ "Nodo5_18"->"Nodo5_19"
+ "Nodo5_18"->"Nodo5_19"[dir = back]
+ "Nodo6_18"[style="filled", fillcolor="#000000", fontsize=1, group="6"]                                                                                
+ "Nodo6_18"->"Nodo6_20"
+ "Nodo6_18"->"Nodo6_20"[dir = back]
+ {rank=same;"Nodo0_18";"Nodo2_18";"Nodo5_18";"Nodo6_18"}
+ "Nodo0_19"[label = "18", group="0"]                                                                                                                   
+ "Nodo0_19"->"Nodo3_19"
+ "Nodo0_19"->"Nodo3_19"[dir = back]
+ "Nodo0_19"->"Nodo0_20"
+ "Nodo0_19"->"Nodo0_20"[dir = back]
+ "Nodo3_19"[style="filled", fillcolor="#000000", fontsize=1, group="3"]                                                                                
+ "Nodo3_19"->"Nodo5_19"
+ "Nodo3_19"->"Nodo5_19"[dir = back]
+ "Nodo3_19"->"Nodo3_20"
+ "Nodo3_19"->"Nodo3_20"[dir = back]
+ "Nodo5_19"[style="filled", fillcolor="#000000", fontsize=1, group="5"]                                                                                
+ "Nodo5_19"->"Nodo5_23"
+ "Nodo5_19"->"Nodo5_23"[dir = back]
+ {rank=same;"Nodo0_19";"Nodo3_19";"Nodo5_19"}
+ "Nodo0_20"[label = "19", group="0"]                                                                                                                   
+ "Nodo0_20"->"Nodo3_20"
+ "Nodo0_20"->"Nodo3_20"[dir = back]
+ "Nodo0_20"->"Nodo0_21"
+ "Nodo0_20"->"Nodo0_21"[dir = back]
+ "Nodo3_20"[style="filled", fillcolor="#000000", fontsize=1, group="3"]                                                                                
+ "Nodo3_20"->"Nodo6_20"
+ "Nodo3_20"->"Nodo6_20"[dir = back]
+ "Nodo6_20"[style="filled", fillcolor="#000000", fontsize=1, group="6"]                                                                                
+ "Nodo6_20"->"Nodo6_21"
+ "Nodo6_20"->"Nodo6_21"[dir = back]
+ {rank=same;"Nodo0_20";"Nodo3_20";"Nodo6_20"}
+ "Nodo0_21"[label = "20", group="0"]                                                                                                                   
+ "Nodo0_21"->"Nodo4_21"
+ "Nodo0_21"->"Nodo4_21"[dir = back]
+ "Nodo0_21"->"Nodo0_22"
+ "Nodo0_21"->"Nodo0_22"[dir = back]
+ "Nodo4_21"[style="filled", fillcolor="#000000", fontsize=1, group="4"]                                                                                
+ "Nodo4_21"->"Nodo6_21"
+ "Nodo4_21"->"Nodo6_21"[dir = back]
+ "Nodo4_21"->"Nodo4_22"
+ "Nodo4_21"->"Nodo4_22"[dir = back]
+ "Nodo6_21"[style="filled", fillcolor="#000000", fontsize=1, group="6"]                                                                                
+ "Nodo6_21"->"Nodo6_24"
+ "Nodo6_21"->"Nodo6_24"[dir = back]
+ {rank=same;"Nodo0_21";"Nodo4_21";"Nodo6_21"}
+ "Nodo0_22"[label = "21", group="0"]                                                                                                                   
+ "Nodo0_22"->"Nodo4_22"
+ "Nodo0_22"->"Nodo4_22"[dir = back]
+ "Nodo0_22"->"Nodo0_23"
+ "Nodo0_22"->"Nodo0_23"[dir = back]
+ "Nodo4_22"[style="filled", fillcolor="#000000", fontsize=1, group="4"]                                                                                
+ {rank=same;"Nodo0_22";"Nodo4_22"}
+ "Nodo0_23"[label = "22", group="0"]                                                                                                                   
+ "Nodo0_23"->"Nodo5_23"
+ "Nodo0_23"->"Nodo5_23"[dir = back]
+ "Nodo0_23"->"Nodo0_24"
+ "Nodo0_23"->"Nodo0_24"[dir = back]
+ "Nodo5_23"[style="filled", fillcolor="#000000", fontsize=1, group="5"]                                                                                
+ {rank=same;"Nodo0_23";"Nodo5_23"}
+ "Nodo0_24"[label = "23", group="0"]                                                                                                                   
+ "Nodo0_24"->"Nodo6_24"
+ "Nodo0_24"->"Nodo6_24"[dir = back]
+ "Nodo6_24"[style="filled", fillcolor="#000000", fontsize=1, group="6"]                                                                                
+ {rank=same;"Nodo0_24";"Nodo6_24"}
+ }
