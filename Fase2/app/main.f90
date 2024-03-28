@@ -1,117 +1,314 @@
 program MenuPrincipal
-  use linked_list_m
-
+    use linked_list_m
+    use json_module
+    use btree_m
+    use abb_m
+    
+    use cliente_m
+  
   implicit none
-  type(linked_list):: lista_usuarios
-  character(len=20) :: usuario, password
-  integer :: opcion
-
-  ! Datos del usuario administrador
-  character(len=20) :: usuario_admin = 'admin'
-  character(len=20) :: password_admin = 'EDD2024'
-
+  type(btree) :: mi_arbol
+  type(cliente) :: cliente1
+  type(linked_list) :: lista_usuarios
+  type(json_file) :: json
+  type(json_core) :: jsonc
+  type(json_value), pointer :: listPointer, clientePointer, attributePointer
+    !Variable para arbol de capas
+    type(abb) :: arbol
+    type(pixel) :: info
+  logical :: found
+  
+  integer :: opcion, num_pasadas, i, size
+  
+  character(len=40) :: nombre_json, id_str
+  
   ! Variables para el registro de usuarios
-  character(len=20) :: nombre_completo, dpi, password_usuario
+  character(len=:), allocatable :: nombre_completo, password_usuario, dpi
 
-  ! Variables para controlar el inicio de sesión
-  logical :: sesion_iniciada
-  sesion_iniciada = .false.
+  character(len=:), allocatable :: nombre_cliente, password
 
+
+
+  call json%initialize()
+  
   do
-      print *, "---- MENÚ PRINCIPAL ----"
-      print *, "1. Inicio de Sesión"
+      print *, "---- MENu PRINCIPAL ----"
+      print *, "1. Inicio de Sesion"
       print *, "2. Registro de Usuarios"
       print *, "3. Acerca de"
       print *, "4. Salir"
-      print *, "Seleccione una opción: "
-      read(*,*) opcion
-
+      print *, "Seleccione una opcion: "
+      read(*, *) opcion
+      
       select case(opcion)
       case(1)
-          call IniciarSesion(usuario, password, sesion_iniciada, lista_usuarios)
+          call IniciarSesion()
       case(2)
-          call RegistrarUsuario(nombre_completo, dpi, password_usuario)
+          call RegistrarUsuario()
       case(3)
-          call AcercaDe
+          call AcercaDe()
       case(4)
           exit
       case default
-          print *, "Opción no válida. Por favor, seleccione una opción válida."
-  end select
-  
+          print *, "Opcion no valida. Por favor, seleccione una opcion valida."
+      end select
   end do
-
+  
 contains
 
-subroutine IniciarSesion(usuario, password, sesion_iniciada, lista_usuarios)
-  use linked_list_m
-  implicit none
-  character(len=20), intent(out) :: usuario
-  character(len=20), intent(out) :: password
-  logical, intent(out) :: sesion_iniciada
-  class(linked_list), intent(in) :: lista_usuarios
+function string_to_integer(str)
+    character(len=*), intent(in) :: str
+    integer :: string_to_integer
+    integer :: i, num
 
-  character(len=5) :: usuario_admin = 'admin'
-  character(len=10) :: password_admin = 'EDD2024'
+    ! Inicializar num a cero
+    num = 0
 
-  type(user), pointer :: current_user
+    do i = 1, len(str)
+        if (str(i:i) >= '0' .and. str(i:i) <= '9') then
+            num = num * 10 + ichar(str(i:i)) - ichar('0')
+        else
+            ! Si se encuentra un carácter no numérico, imprimir el mensaje de error y salir de la función
+            print *, "Error: El string contiene caracteres no numéricos."
+            string_to_integer = -1
+            return
+        end if
+    end do
 
-  ! Lógica para el inicio de sesión
-  print *, "Ingrese el nombre de usuario: "
-  read(*,*) usuario
-  print *, "Ingrese la contraseña: "
-  read(*,*) password
+    ! Devolver el número solo si la conversión se realizó correctamente
+    string_to_integer = num
+end function string_to_integer
 
-  sesion_iniciada = .false. ! Por defecto, la sesión no está iniciada
+  subroutine carga_masiva_usuarios()
+    integer :: int_dpi
+      print *, 'Ha seleccionado Carga masiva de clientes'
+      ! read the file
+      print *, 'Ingrese el nombre del  archivo JSON:'
+      read(*, '(A)') nombre_json
+      
+      call json%load(filename=nombre_json)
+      
+      ! print the file to the console
+      call json%print()
+      
+      call json%info('', n_children=size)
+      
+      call json%get_core(jsonc)
+      call json%get('', listPointer, found)
+      
+      do i = 1, size
+          call jsonc%get_child(listPointer, i, clientePointer, found)
+          
+          !imprimiendo el atributo nombre_cliente
+          call jsonc%get_child(clientePointer, 'nombre_cliente', attributePointer, found)
+          call jsonc%get(attributePointer, nombre_cliente)
+          print *, "Nombre del cliente: ", trim(nombre_cliente)
+          
+          !imprimiendo el atributo dpi
+          call jsonc%get_child(clientePointer, 'dpi', attributePointer, found)
+          call jsonc%get(attributePointer, dpi)
+          print *, "DPI del cliente: ", dpi
+          
+          !imprimiendo el atributo password
+          call jsonc%get_child(clientePointer, 'password', attributePointer, found)
+          call jsonc%get(attributePointer, password)
+          print *, "Contrasena del cliente: ", trim(password)
+          int_dpi = string_to_integer(dpi)
+          
+          print *, "DPI del cliente (entero): ", int_dpi
+          cliente1 = cliente(dpi=int_dpi, nombre=nombre_cliente, contrasena=password)
 
-  ! Comprobamos si el usuario es el administrador
-  if (usuario == usuario_admin .and. password == password_admin) then
-      print *, "Inicio de sesión exitoso como administrador."
-      sesion_iniciada = .true.
-      return
-  end if
 
-  ! Si el usuario no es el administrador, buscamos en la lista de usuarios registrados
-  current_user => lista_usuarios%get_head() ! Using get_head method to get the head of the linked list
-  do while (associated(current_user))
-    
-      if (trim(current_user%nombre_completo) == trim(usuario) .and. &
-          trim(current_user%contrasena) == trim(password)) then
-          print *, "Inicio de sesión exitoso como ", trim(current_user%nombre_completo), " (usuario)."
-          sesion_iniciada = .true.
-          return
-      end if
-      current_user => current_user%next
-  end do
+          call mi_arbol%insert(cliente1)
 
-  ! Si no se encontró el usuario en la lista, se muestra un mensaje de error
-  print *, "Nombre de usuario o contraseña incorrectos."
+          
+      end do
+  end subroutine carga_masiva_usuarios
+  
+  subroutine IniciarSesion()
+    implicit none
+    character(len=20) :: usuario, contrasena
+    logical :: login_successful
+
+    ! Logica para el inicio de sesion
+    print *, "Ingrese el nombre de usuario: "
+    read(*, *) usuario
+    print *, "Ingrese la contrasena: "
+    read(*, *) contrasena
+
+    ! Comprobamos si el usuario es el administrador
+    if (usuario == 'admin' .and. contrasena == 'EDD2024') then
+        print *, "Inicio de sesion exitoso como administrador."
+        call MenuAdministrador()
+        return
+    end if
+    print *, "No es el administrador."
+    ! Buscamos el usuario en la lista de usuarios
+    login_successful = mi_arbol%buscar_usuario(usuario, contrasena)
+
+    ! Comprobar si el inicio de sesión fue exitoso
+    if (login_successful) then
+        print *, "Inicio de sesion exitoso."
+        call MenuUsuario(usuario)
+        return
+    else
+        print *, "Nombre de usuario o contrasena incorrectos."
+    end if
+    ! Si no se encontro el usuario en la lista, se muestra un mensaje de error
+    print *, "Nombre de usuario o contrasena incorrectos."
 end subroutine IniciarSesion
 
-  subroutine RegistrarUsuario(nombre_completo, dpi, password_usuario)
+  subroutine MenuUsuario(usuario)
+    implicit none
+    character(len=20), intent(in) :: usuario
+    
+    integer :: opcion
+
+    do
+        call MostrarMenuUsuario(usuario)
+        read(*, *) opcion
+        
+        select case(opcion)
+        case(1)
+            call reportes_estructuras()
+        case(2)
+            call gestion_imagenes()
+        case(3)
+            call opciones_carga_masiva()
+        case(4)
+            exit
+        case default
+            print *, "Opcion no valida. Por favor, seleccione una opcion valida."
+        end select
+    end do
+    end subroutine MenuUsuario
+
+    subroutine MostrarMenuUsuario(usuario)
+        implicit none
+        character(len=20), intent(in) :: usuario
+        print *, "---- MENu Usuario ----" // usuario
+        print *, "1. Visualizar reportes de las estructuras"
+        print *, "2. Navegación y gestión de imágenes."
+        print *, "3. Opciones de carga masiva."
+        print *, "4. Salir."
+        print *, "Seleccione una opcion: "
+    end subroutine MostrarMenuUsuario
+
+  subroutine MostrarMenuAdministrador()
+      print *, "---- MENu ADMINISTRADOR ----"
+      print *, "1. arbol B de usuarios (Grafico)"
+      print *, "2. Operaciones sobre los usuarios (insertar, modificar y eliminar)"
+      print *, "3. Operaciones de carga masiva de usuarios."
+      print *, "4. Salir."
+      print *, "Seleccione una opcion: "
+  end subroutine MostrarMenuAdministrador
+  
+  subroutine grafico_arbol_usuarios()
+      print *, "Grafico del arbol B de usuarios."
+  end subroutine grafico_arbol_usuarios
+  
+  subroutine operaciones_usuarios()
+      print *, "Operaciones sobre los usuarios (insertar, modificar y eliminar)."
+  end subroutine operaciones_usuarios
+  
+  subroutine MenuAdministrador()
       implicit none
-      character(len=20), intent(out) :: nombre_completo
-      character(len=20), intent(out) :: dpi
-      character(len=20), intent(out) :: password_usuario
-
-      ! Lógica para el registro de usuarios
+      integer :: opcion
+      
+      do
+          call MostrarMenuAdministrador()
+          read(*, *) opcion
+          
+          select case(opcion)
+          case(1)
+              call grafico_arbol_usuarios()
+          case(2)
+              call operaciones_usuarios()
+          case(3)
+              call carga_masiva_usuarios()
+          case(4)
+              exit
+          case default
+              print *, "Opcion no valida. Por favor, seleccione una opcion valida."
+          end select
+      end do
+  end subroutine MenuAdministrador
+  
+  subroutine RegistrarUsuario()
+    implicit none
+    character(len=40) :: nombre_completo, password_usuario
+      integer :: int_dpi2
+      ! Logica para el registro de usuarios
       print *, "Ingrese el nombre completo del nuevo usuario: "
-      read(*,*) nombre_completo
+      read(*, '(A)') nombre_completo
       print *, "Ingrese el DPI del nuevo usuario: "
-      read(*,*) dpi
-      print *, "Ingrese la contraseña para el nuevo usuario: "
-      read(*,*) password_usuario
-
-      ! Agregar el usuario a la lista enlazada
-    call lista_usuarios%append_usuario(nombre_completo, dpi, password_usuario)
-
+      read(*, *) int_dpi2
+      print *, "Ingrese la contrasena para el nuevo usuario: "
+      read(*, '(A)') password_usuario
+      cliente1 = cliente(dpi=int_dpi2, nombre=nombre_completo, contrasena=password_usuario)
+          call mi_arbol%insert(cliente1)
   end subroutine RegistrarUsuario
-
+  
   subroutine AcercaDe
       implicit none
-
-      ! Información acerca del programa
-      print *, "Este es un programa de ejemplo para un menú en Fortran."
+      
+      print *, "Este es un programa de ejemplo para un menu en Fortran."
   end subroutine AcercaDe
 
+  subroutine reportes_estructuras()
+      print *, "Reportes de las estructuras."
+  end subroutine reportes_estructuras
+
+    subroutine gestion_imagenes()
+        print *, "Gestion de imagenes."
+    end subroutine gestion_imagenes
+
+    subroutine opciones_carga_masiva()
+        implicit none
+      integer :: opcion
+      
+      do
+          call MostrarMenuCargaMasiva()
+          read(*, *) opcion
+          
+          select case(opcion)
+          case(1)
+              call CargaCapas()
+          case(2)
+              call CargaImagenes()
+          case(3)
+              call CargaAlbumes()
+          case(4)
+              exit
+          case default
+              print *, "Opcion no valida. Por favor, seleccione una opcion valida."
+          end select
+      end do
+    end subroutine opciones_carga_masiva
+
+    subroutine MostrarMenuCargaMasiva()
+        print *, "---- MENu Carga Masiva ----"
+        print *, "1. Carga de capas"
+        print *, "2. Carga de imagenes"
+        print *, "3. Carga de albumes"
+        print *, "4. Salir."
+        print *, "Seleccione una opcion: "
+    end subroutine MostrarMenuCargaMasiva
+
+    subroutine CargaCapas()
+        print *, "Carga de capas."
+        
+    end subroutine CargaCapas
+
+    subroutine CargaImagenes()
+        print *, "Carga de imagenes."
+    end subroutine CargaImagenes
+
+    subroutine CargaAlbumes()
+        print *, "Carga de albumes."
+    end subroutine CargaAlbumes
+
+
+
+  
 end program MenuPrincipal

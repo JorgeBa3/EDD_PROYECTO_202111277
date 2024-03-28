@@ -52,9 +52,9 @@ contains
 
     subroutine append_usuario(self, nombre_completo, dpi, contrasena)
         class(linked_list), intent(inout) :: self
-        character(len=20), intent(in) :: nombre_completo
-        character(len=20), intent(in) :: dpi
-        character(len=20), intent(in) :: contrasena
+        character(len=*), intent(in) :: nombre_completo
+        character(len=*), intent(in) :: dpi
+        character(len=*), intent(in) :: contrasena
 
         type(user), pointer :: current_user
         type(user), pointer :: new_user
