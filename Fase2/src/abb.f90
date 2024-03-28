@@ -9,13 +9,13 @@ module abb_m
         character(len=7) :: color
     end type pixel
 
-    type :: node
-        integer :: value
-        integer :: height = 1
-        type(node), pointer :: right => null()
-        type(node), pointer :: left => null()
-        type(pixel), allocatable :: pixeles(:)
-    end type node
+type :: node
+    integer :: value
+    integer :: height = 1
+    type(node), pointer :: right => null()
+    type(node), pointer :: left => null()
+    type(pixel), allocatable :: pixeles(:)
+end type node
 
     type, public :: abb
         type(node), pointer :: root => null()

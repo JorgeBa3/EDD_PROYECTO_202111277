@@ -3,27 +3,31 @@ program MenuPrincipal
     use json_module
     use btree_m
     use abb_m
-    
+    use matrix_m
     use cliente_m
-  
-  implicit none
-  type(btree) :: mi_arbol
-  type(cliente) :: cliente1
-  type(linked_list) :: lista_usuarios
-  type(json_file) :: json
-  type(json_core) :: jsonc
-  type(json_value), pointer :: listPointer, clientePointer, attributePointer
-    !Variable para arbol de capas
+
+    implicit none
+    type(btree) :: mi_arbol
+    type(cliente) :: cliente1
+    type(linked_list) :: lista_usuarios
+    type(json_file) :: json
+    type(json_core) :: jsonc
+    type(json_value), pointer :: listPointer, clientePointer, attributePointer, attributePointer2, capasPointer
+        !Variable para arbol de capas
+    integer, dimension(:), allocatable :: capas, imgs
     type(abb) :: arbol
     type(pixel) :: info
   logical :: found
-  
+  type(json_value), pointer ::  capaPointer, pixelPointer
+    
+    integer :: id_capa, fila, columna, j,id
+    character(len=:), allocatable ::color, nombre_album
   integer :: opcion, num_pasadas, i, size
   
   character(len=40) :: nombre_json, id_str
   
   ! Variables para el registro de usuarios
-  character(len=:), allocatable :: nombre_completo, password_usuario, dpi
+  character(len=:), allocatable :: nombre_completo, password_usuario, dpi, str_fila, str_columna
 
   character(len=:), allocatable :: nombre_cliente, password
 
@@ -97,31 +101,30 @@ end function string_to_integer
       call json%get('', listPointer, found)
       
       do i = 1, size
-          call jsonc%get_child(listPointer, i, clientePointer, found)
-          
-          !imprimiendo el atributo nombre_cliente
-          call jsonc%get_child(clientePointer, 'nombre_cliente', attributePointer, found)
-          call jsonc%get(attributePointer, nombre_cliente)
-          print *, "Nombre del cliente: ", trim(nombre_cliente)
-          
-          !imprimiendo el atributo dpi
-          call jsonc%get_child(clientePointer, 'dpi', attributePointer, found)
-          call jsonc%get(attributePointer, dpi)
-          print *, "DPI del cliente: ", dpi
-          
-          !imprimiendo el atributo password
-          call jsonc%get_child(clientePointer, 'password', attributePointer, found)
-          call jsonc%get(attributePointer, password)
+        call jsonc%get_child(listPointer, i, clientePointer, found)
+        
+        !imprimiendo el atributo nombre_cliente
+        call jsonc%get_child(clientePointer, 'nombre_cliente', attributePointer, found)
+        call jsonc%get(attributePointer, nombre_cliente)
+        print *, "Nombre del cliente: ", trim(nombre_cliente)
+
+        !imprimiendo el atributo dpi
+        call jsonc%get_child(clientePointer, 'dpi', attributePointer, found)
+        call jsonc%get(attributePointer, dpi)
+        print *, "DPI del cliente: ", dpi
+        
+        !imprimiendo el atributo password
+        call jsonc%get_child(clientePointer, 'password', attributePointer, found)
+        call jsonc%get(attributePointer, password)
           print *, "Contrasena del cliente: ", trim(password)
-          int_dpi = string_to_integer(dpi)
-          
+        int_dpi = string_to_integer(dpi)
+
           print *, "DPI del cliente (entero): ", int_dpi
-          cliente1 = cliente(dpi=int_dpi, nombre=nombre_cliente, contrasena=password)
+        cliente1 = cliente(dpi=int_dpi, nombre=nombre_cliente, contrasena=password)
 
 
-          call mi_arbol%insert(cliente1)
+        call mi_arbol%insert(cliente1)
 
-          
       end do
   end subroutine carga_masiva_usuarios
   
@@ -296,16 +299,123 @@ end subroutine IniciarSesion
     end subroutine MostrarMenuCargaMasiva
 
     subroutine CargaCapas()
-        print *, "Carga de capas."
-        
-    end subroutine CargaCapas
+    integer :: int_id_capa
 
-    subroutine CargaImagenes()
-        print *, "Carga de imagenes."
-    end subroutine CargaImagenes
+    print *, 'Ha seleccionado Carga masiva de capas'
+    ! read the file
+    print *, 'Ingrese el nombre del archivo JSON:'
+    read(*, '(A)') nombre_json
+
+    call json%load(filename=trim(nombre_json))
+
+    ! print the file to the console
+    call json%print()
+    call json%info('', n_children=size)
+      
+    call json%get_core(jsonc)
+    call json%get('', listPointer, found)
+    
+    
+
+    do i = 1, size
+        call jsonc%get_child(listPointer, i, capaPointer, found)
+        
+        ! Obtener el id_capa
+        call jsonc%get_child(capaPointer, 'id_capa', attributePointer, found)
+        call jsonc%get(attributePointer, id_capa)
+        print *, "ID de Capa: ", id_capa
+        ! Obtener los pixeles de la capa
+        call jsonc%get_child(capaPointer, 'pixeles', pixelPointer, found)
+        ! Obtener la cantidad de elementos en el arreglo de pixeles
+        call jsonc%info(pixelPointer, n_children=num_pasadas)
+        ! Iterar sobre cada pixel
+        do j = 1, num_pasadas
+            call jsonc%get_child(pixelPointer, j, attributePointer2, found)
+            ! Obtener fila del pixel
+            call jsonc%get_child(attributePointer2, 'fila', attributePointer, found)
+            call jsonc%get(attributePointer, fila)
+            ! Obtener columna del pixel
+            call jsonc%get_child(attributePointer2, 'columna', attributePointer, found)
+            call jsonc%get(attributePointer, columna)
+            ! Obtener color del pixel
+            call jsonc%get_child(attributePointer2, 'color', attributePointer, found)
+            call jsonc%get(attributePointer, color)
+            
+            ! Imprimir información del pixel
+            print *, "Pixel", id_capa,"- Fila:", fila, ", Columna:", columna, ", Color:", color
+            info = pixel(fila, columna, color)
+            call arbol%insert_abb(id_capa, info)
+            
+        end do
+    end do
+    call arbol%graph_abb("capas")
+end subroutine CargaCapas
+
+subroutine CargaImagenes()
+    
+    print *, 'Ha seleccionado Carga masiva de Imagenes'
+    ! leer el nombre del archivo JSON
+    print *, 'Ingrese el nombre del archivo JSON:'
+    read(*, '(A)') nombre_json
+    
+    call json%load(filename=nombre_json)
+    
+    ! imprimir el archivo en la consola
+    call json%print()
+    
+    call json%info('', n_children=size)
+    
+    call json%get_core(jsonc)
+    call json%get('', listPointer, found)
+    
+    do i = 1, size
+        call jsonc%get_child(listPointer, i, clientePointer, found)
+        
+        !imprimiendo el atributo id
+        call jsonc%get_child(clientePointer, 'id', attributePointer, found)
+        call jsonc%get(attributePointer, id)
+        print *, "ID de la capa: ", id
+
+        !imprimiendo el atributo capas
+        call jsonc%get_child(clientePointer, 'capas', capasPointer, found)
+        call jsonc%get(capasPointer, capas)
+        print *, "Capas asociadas: ", capas
+        ! imprimir las capas asociadas
+    end do
+end subroutine CargaImagenes
+
 
     subroutine CargaAlbumes()
-        print *, "Carga de albumes."
+        
+    print *, 'Ha seleccionado Carga masiva de albumes'
+    ! leer el nombre del archivo JSON
+    print *, 'Ingrese el nombre del archivo JSON:'
+    read(*, '(A)') nombre_json
+    
+    call json%load(filename=nombre_json)
+    
+    ! imprimir el archivo en la consola
+    call json%print()
+    
+    call json%info('', n_children=size)
+    
+    call json%get_core(jsonc)
+    call json%get('', listPointer, found)
+    
+    do i = 1, size
+        call jsonc%get_child(listPointer, i, clientePointer, found)
+        
+        !imprimiendo el atributo nombre_album
+        call jsonc%get_child(clientePointer, 'nombre_album', attributePointer, found)
+        call jsonc%get(attributePointer, nombre_album)
+        print *, "nombre_album: ", nombre_album
+
+        !imprimiendo el atributo imgs
+        call jsonc%get_child(clientePointer, 'imgs', capasPointer, found)
+        call jsonc%get(capasPointer, imgs)
+        print *, "imgs: ", imgs
+        ! imprimir las capas asociadas
+    end do
     end subroutine CargaAlbumes
 
 
