@@ -1,5 +1,6 @@
 program MenuPrincipal
     use linked_list_m
+    use avl_m
     use json_module
     use btree_m
     use abb_m
@@ -16,6 +17,8 @@ program MenuPrincipal
         !Variable para arbol de capas
     integer, dimension(:), allocatable :: capas, imgs
     type(abb) :: arbol
+    type(matrix) :: matriz
+    type(avl) :: arbolavl
     type(pixel) :: info
   logical :: found
   type(json_value), pointer ::  capaPointer, pixelPointer
@@ -72,14 +75,14 @@ function string_to_integer(str)
         if (str(i:i) >= '0' .and. str(i:i) <= '9') then
             num = num * 10 + ichar(str(i:i)) - ichar('0')
         else
-            ! Si se encuentra un carácter no numérico, imprimir el mensaje de error y salir de la función
+            ! Si se encuentra un carácter no numérico, imprimir el mensaje de error y salir de la funcion
             print *, "Error: El string contiene caracteres no numéricos."
             string_to_integer = -1
             return
         end if
     end do
 
-    ! Devolver el número solo si la conversión se realizó correctamente
+    ! Devolver el número solo si la conversion se realizo correctamente
     string_to_integer = num
 end function string_to_integer
 
@@ -149,7 +152,7 @@ end function string_to_integer
     ! Buscamos el usuario en la lista de usuarios
     login_successful = mi_arbol%buscar_usuario(usuario, contrasena)
 
-    ! Comprobar si el inicio de sesión fue exitoso
+    ! Comprobar si el inicio de sesion fue exitoso
     if (login_successful) then
         print *, "Inicio de sesion exitoso."
         call MenuUsuario(usuario)
@@ -191,7 +194,7 @@ end subroutine IniciarSesion
         character(len=20), intent(in) :: usuario
         print *, "---- MENu Usuario ----" // usuario
         print *, "1. Visualizar reportes de las estructuras"
-        print *, "2. Navegación y gestión de imágenes."
+        print *, "2. Navegacion y gestion de imágenes."
         print *, "3. Opciones de carga masiva."
         print *, "4. Salir."
         print *, "Seleccione una opcion: "
@@ -341,7 +344,7 @@ end subroutine IniciarSesion
             call jsonc%get_child(attributePointer2, 'color', attributePointer, found)
             call jsonc%get(attributePointer, color)
             
-            ! Imprimir información del pixel
+            ! Imprimir informacion del pixel
             print *, "Pixel", id_capa,"- Fila:", fila, ", Columna:", columna, ", Color:", color
             info = pixel(fila, columna, color)
             call arbol%insert_abb(id_capa, info)
@@ -380,6 +383,12 @@ subroutine CargaImagenes()
         call jsonc%get_child(clientePointer, 'capas', capasPointer, found)
         call jsonc%get(capasPointer, capas)
         print *, "Capas asociadas: ", capas
+        call jsonc%info(capasPointer, n_children=num_pasadas)
+        do j = 1, num_pasadas
+            print *, "num capa: ", capas(j)
+        end do
+
+        
         ! imprimir las capas asociadas
     end do
 end subroutine CargaImagenes
@@ -414,8 +423,15 @@ end subroutine CargaImagenes
         call jsonc%get_child(clientePointer, 'imgs', capasPointer, found)
         call jsonc%get(capasPointer, imgs)
         print *, "imgs: ", imgs
+        call jsonc%info(capasPointer, n_children=num_pasadas)
+        do j = 1, num_pasadas
+            print *, "num imgs: ", imgs(j)
+        end do
         ! imprimir las capas asociadas
+        
     end do
+
+
     end subroutine CargaAlbumes
 
 

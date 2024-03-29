@@ -1,17 +1,19 @@
 module avl_m
-    use uuid_module
+    use abb_m
     implicit none
     private
 
-    type :: node
+    type :: node_avl
         integer :: value
         integer :: height = 1
-        type(node), pointer :: right => null()
-        type(node), pointer :: left => null()
-    end type node
+        type(node_avl), pointer :: right => null()
+        type(node_avl), pointer :: left => null()
+        type(abb), pointer :: abb_tree => null()  ! Árbol ABB en cada nodo AVL
+        type(pixel), allocatable :: pixels(:)     ! Información de píxeles asociada al nodo AVL
+    end type node_avl
 
     type, public :: avl
-        type(node), pointer :: root => null()
+        type(node_avl), pointer :: root => null()
     contains
         procedure :: insert
         procedure :: delete
@@ -20,12 +22,13 @@ module avl_m
     end type avl
 
 contains    
-    !Subrutinas del tipo avl
-    subroutine insert(self, val)
+    ! Subrutinas del tipo avl
+    subroutine insert(self, val, info)
         class(avl), intent(inout) :: self
         integer, intent(in) :: val
+        type(pixel), intent(in) :: info
 
-        call insertRec(self%root, val)
+        call insertRec(self%root, val, info)
     end subroutine insert
 
     subroutine delete(self, val)
@@ -51,7 +54,6 @@ contains
         open(newunit=io, file="./avl_tree.dot")
         command = "dot -Tpng ./avl_tree.dot -o ./avl_tree.png"
 
-
         write(io, *) "digraph G {"
         if(associated(self%root)) then
             call printRec(self%root, generate_uuid(), io)
@@ -66,23 +68,23 @@ contains
         else
             print *, "La imagen fue generada exitosamente"
         end if
-
     end subroutine graph
 
-    !Subrutinas de apoyo
-    recursive subroutine insertRec(root, val)
-        type(node), pointer, intent(inout) :: root
+    ! Subrutinas de apoyo
+    recursive subroutine insertRec(root, val, info)
+        type(node_avl), pointer, intent(inout) :: root
         integer, intent(in) :: val
+        type(pixel), intent(in) :: info
 
         if(.not. associated(root)) then
             allocate(root)
-            root = node(value=val)
-
+            root%value = val
+            allocate(root%pixels(1))
+            root%pixels(1) = info
         else if(val < root%value) then
-            call insertRec(root%left, val)
-
+            call insertRec(root%left, val, info)
         else if(val > root%value) then
-            call insertRec(root%right, val)
+            call insertRec(root%right, val, info)
         end if
 
         root%height = maxHeight(getHeight(root%left), getHeight(root%right)) + 1
@@ -91,7 +93,6 @@ contains
             if(getBalance(root%right) < 0) then
                 root%right => rightRotation(root%right)
                 root => leftRotation(root)
-
             else
                 root => leftRotation(root)
             end if
@@ -101,7 +102,6 @@ contains
             if(getBalance(root%left) > 0) then
                 root%left => leftRotation(root%left)
                 root => rightRotation(root)
-            
             else
                 root => rightRotation(root)
             end if
@@ -109,10 +109,10 @@ contains
     end subroutine insertRec
 
     recursive function deleteRec(root, val) result(res)
-        type(node), pointer :: root
+        type(node_avl), pointer :: root
         integer, intent(in) :: val
-        type(node), pointer :: res
-        type(node), pointer :: temp
+        type(node_avl), pointer :: res
+        type(node_avl), pointer :: temp
 
         if(.not. associated(root)) then
             res => root
@@ -171,9 +171,9 @@ contains
     end function deleteRec
 
     function leftRotation(root) result(rootRight)
-        type(node), pointer, intent(in) :: root
-        type(node), pointer :: rootRight
-        type(node), pointer :: temp  
+        type(node_avl), pointer, intent(in) :: root
+        type(node_avl), pointer :: rootRight
+        type(node_avl), pointer :: temp  
         
         rootRight => root%right
         temp => root%right%left
@@ -186,9 +186,9 @@ contains
     end function leftRotation
 
     function rightRotation(root) result(rootLeft)
-        type(node), pointer, intent(in) :: root
-        type(node), pointer :: rootLeft
-        type(node), pointer :: temp
+        type(node_avl), pointer, intent(in) :: root
+        type(node_avl), pointer :: rootLeft
+        type(node_avl), pointer :: temp
 
         rootLeft => root%left
         temp => rootLeft%right
@@ -214,7 +214,7 @@ contains
     end function maxHeight
 
     function getHeight(n) result(res)
-        type(node), pointer, intent(in) :: n
+        type(node_avl), pointer, intent(in) :: n
         integer :: res
         res = 0
 
@@ -223,14 +223,14 @@ contains
     end function getHeight
 
     function getBalance(root) result(res)
-        type(node), intent(in) :: root
+        type(node_avl), intent(in) :: root
 
         integer :: res
         res = getHeight(root%right) - getHeight(root%left)
     end function getBalance
 
     recursive subroutine getMajorOfMinors(root, major)
-        type(node), pointer :: root, major
+        type(node_avl), pointer :: root, major
         if (associated(root%right)) then
             call getMajorOfMinors(root%right, major)
         else
@@ -239,7 +239,7 @@ contains
     end subroutine getMajorOfMinors
 
     recursive subroutine preorderRec(root)
-        type(node), pointer, intent(in) :: root
+        type(node_avl), pointer, intent(in) :: root
 
         if(associated(root)) then
             print *, root%value
@@ -249,7 +249,7 @@ contains
     end subroutine preorderRec
 
     recursive subroutine printRec(root, name, io)
-        type(node), pointer :: root
+        type(node_avl), pointer :: root
         character(len=36) :: name
         integer :: io
 
