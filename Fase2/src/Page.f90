@@ -3,7 +3,7 @@ module cliente_m
     
     ! Definición del tipo cliente
     type :: cliente
-        integer :: dpi
+        integer(kind=16) :: dpi
         character(len=50) :: nombre
         character(len=20) :: contrasena
     end type cliente

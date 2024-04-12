@@ -1,112 +1,136 @@
-module linked_list_m
+module List_of_list_m
+    
     implicit none
     private
 
-    public :: user
-    public :: linked_list
-    public :: push_usuario, append_usuario, print_users, destructor, get_head
-    
-    type :: user
+    type :: sub_node
+        integer :: value
+        type(sub_node), pointer :: next => null()
+    end type sub_node
 
-        
-        character(len=20) :: nombre_completo
-        character(len=20) :: dpi
-        character(len=20) :: contrasena
-        type(user), pointer :: next => null()
-    end type user
-
-    type, public :: linked_list
-        private
-        type(user), pointer :: head => null()
-
+    type :: node
+        character(len=:), allocatable :: index
+        type(node), pointer :: next => null()
+        type(node), pointer :: prev => null()
+        type(sub_node), pointer :: list => null()
     contains
-        procedure :: push_usuario
-        procedure :: append_usuario
-        ! procedure :: insert
-        procedure :: print_users
-        final :: destructor
-        procedure :: get_head ! Método para obtener el head de la lista enlazada
-    end type linked_list
+        procedure :: append_album
+        procedure :: print
+    end type node
+
+    type, public :: List_of_list
+        type(node), pointer :: head => null()
+        type(node), pointer :: tail => null()
+    contains
+        procedure :: insert_album
+        procedure :: printList
+    end type List_of_list
 
 contains
-    subroutine push_usuario(self, nombre_completo, dpi, contrasena)
-        class(linked_list), intent(inout) :: self
-        character(len=20), intent(in) :: nombre_completo
-        character(len=20), intent(in) :: dpi
-        character(len=20), intent(in) :: contrasena
 
-        type(user), pointer :: new_user
-        allocate(new_user)
 
-        new_user%nombre_completo = nombre_completo
-        new_user%dpi = dpi
-        new_user%contrasena = contrasena
+    subroutine insert_album(self, index, value)
+        class(List_of_list), intent(inout) :: self
+        integer, intent(in) :: value
+        character(len=*), intent(in) :: index
+
+        type(node), pointer :: aux
+        type(node), pointer :: new
+        allocate(new)
 
         if(.not. associated(self%head)) then
-            self%head => new_user
-        else    
-            new_user%next => self%head
-            self%head => new_user
-        end if
-    end subroutine push_usuario
-
-    subroutine append_usuario(self, nombre_completo, dpi, contrasena)
-        class(linked_list), intent(inout) :: self
-        character(len=*), intent(in) :: nombre_completo
-        character(len=*), intent(in) :: dpi
-        character(len=*), intent(in) :: contrasena
-
-        type(user), pointer :: current_user
-        type(user), pointer :: new_user
-        allocate(new_user)
-
-        new_user%nombre_completo = nombre_completo
-        new_user%dpi = dpi
-        new_user%contrasena = contrasena
-
-        if(.not. associated(self%head)) then
-            self%head => new_user
+            allocate(aux)
+            aux%index = index
+            self%head => aux
+            self%tail => aux
+            call aux%append_album(value)
         else
-            current_user => self%head
-            do while(associated(current_user%next))
-                current_user => current_user%next
-            end do
+            if(index < self%head%index) then
+                self%head%prev => new
+                new%next => self%head
+                self%head => new
 
-            current_user%next => new_user
+                new%index = index
+                call new%append_album(value)
+            else
+                aux => self%head
+                do while (associated(aux%next))
+                    if(index < aux%next%index) then
+                        if(index == aux%index) then
+                            call aux%append_album(value)
+                        else
+                            new%next => aux%next
+                            new%prev => aux
+                            aux%next%prev => new
+                            aux%next => new
+
+                            new%index = index
+                            call new%append_album(value)
+                        end if
+                        return
+                    end if
+                    aux => aux%next
+                end do
+
+                if(index == aux%index) then
+                    call aux%append_album(value)
+                else
+                    self%tail%next => new
+                    new%prev => self%tail
+                    self%tail => new
+
+                    new%index = index
+                    call new%append_album(value)
+                end if
+            end if
         end if
+    end subroutine insert_album
 
-    end subroutine append_usuario
+    subroutine printList(self)
+        class(List_of_list) :: self
+        type(node), pointer :: aux
 
-    subroutine print_users(self)
-        class(linked_list), intent(in) :: self
-        type(user), pointer :: current_user
-        current_user => self%head
+        aux => self%head
 
-        do while(associated(current_user))
-            print *, "Nombre completo: ", trim(current_user%nombre_completo)
-            print *, "DPI: ", trim(current_user%dpi)
-            print *, "Contraseña: ", trim(current_user%contrasena)
-            print *
-            current_user => current_user%next
+        do while(associated(aux))
+            print *, 'Indice: ', aux%index
+            call aux%print()
+            print *, ""
+            aux => aux%next
         end do
-    end subroutine print_users
+    end subroutine printList
 
-    subroutine destructor(self)
-        type(linked_list), intent(inout) :: self
-        type(user), pointer :: aux_user
+    !Subrutina y funciones de sub nodo
+    subroutine append_album(self, value)
+        class(node), intent(inout) :: self
+        integer, intent(in) :: value
 
-        do while(associated(self%head))
-            aux_user => self%head%next
-            deallocate(self%head)
-            self%head = aux_user
+        type(sub_node), pointer :: aux
+        type(sub_node), pointer :: new
+
+        allocate(new)
+        new%value = value
+
+        if(.not. associated(self%list)) then
+            self%list => new
+        else
+            aux => self%list
+            do while(associated(aux%next))
+                aux => aux%next
+            end do
+            aux%next => new
+        end if
+    end subroutine append_album
+
+    subroutine print(self)
+        class(node), intent(inout) :: self
+
+        type(sub_node), pointer :: aux
+        aux => self%list
+
+        do while(associated(aux))
+            print *, aux%value
+            aux => aux%next
         end do
-    end subroutine destructor
-
-    function get_head(self) result(head_ptr)
-        class(linked_list), intent(in) :: self
-        type(user), pointer :: head_ptr
-
-        head_ptr => self%head
-    end function get_head
-
-end module linked_list_m
+    end subroutine print
+end module List_of_list_m

@@ -1,275 +1,285 @@
 module avl_m
+    use uuid_module
     use abb_m
     implicit none
     private
 
-    type :: node_avl
-        integer :: value
-        integer :: height = 1
-        type(node_avl), pointer :: right => null()
-        type(node_avl), pointer :: left => null()
-        type(abb), pointer :: abb_tree => null()  ! Árbol ABB en cada nodo AVL
-        type(pixel), allocatable :: pixels(:)     ! Información de píxeles asociada al nodo AVL
-    end type node_avl
+    type :: nodo
+        integer :: valor
+        type(abb) :: abb
+        
+        integer :: altura = 1
+        type(nodo), pointer :: derecha => null()
+        type(nodo), pointer :: izquierda => null() 
+    end type
 
     type, public :: avl
-        type(node_avl), pointer :: root => null()
+        type(nodo), pointer :: raiz => null()
+    
     contains
         procedure :: insert
         procedure :: delete
-        procedure :: preorder
-        procedure :: graph
+        procedure :: preorden
+        procedure :: graficar
     end type avl
 
-contains    
-    ! Subrutinas del tipo avl
-    subroutine insert(self, val, info)
+contains
+
+subroutine insert(self, val, abb_nuevo)
         class(avl), intent(inout) :: self
         integer, intent(in) :: val
-        type(pixel), intent(in) :: info
+        type(abb), intent(in) :: abb_nuevo
+        
 
-        call insertRec(self%root, val, info)
-    end subroutine insert
+    call insertRec(self%raiz, val, abb_nuevo)
+end subroutine insert
 
     subroutine delete(self, val)
         class(avl), intent(inout) :: self
         integer, intent(in) :: val
 
-        self%root => deleteRec(self%root, val)
-    end subroutine
+        self%raiz => deleteRec(self%raiz, val)
+    end subroutine delete
 
-    subroutine preorder(self)
+    subroutine preorden(self)
         class(avl), intent(in) :: self
         
-        call preorderRec(self%root)
-    end subroutine preorder
+        call preordenRec(self%raiz)
+    end subroutine preorden
 
-    subroutine graph(self)
-        class(avl), intent(in) :: self
-        integer :: io
-        integer :: i
-        character(len=100) :: command
-
-        io = 1
-        open(newunit=io, file="./avl_tree.dot")
-        command = "dot -Tpng ./avl_tree.dot -o ./avl_tree.png"
-
-        write(io, *) "digraph G {"
-        if(associated(self%root)) then
-            call printRec(self%root, generate_uuid(), io)
-        end if
-        write(io, *) "}"
-        close(io)
-        
-        call execute_command_line(command, exitstat=i)
-
-        if ( i == 1 ) then
-            print *, "Ocurrió un error al momento de crear la imagen"
-        else
-            print *, "La imagen fue generada exitosamente"
-        end if
-    end subroutine graph
-
-    ! Subrutinas de apoyo
-    recursive subroutine insertRec(root, val, info)
-        type(node_avl), pointer, intent(inout) :: root
+    recursive subroutine insertRec(raiz, val, abb_nuevo)
+        type(nodo), pointer, intent(inout) :: raiz
         integer, intent(in) :: val
-        type(pixel), intent(in) :: info
+        type(abb), intent(in) :: abb_nuevo
 
-        if(.not. associated(root)) then
-            allocate(root)
-            root%value = val
-            allocate(root%pixels(1))
-            root%pixels(1) = info
-        else if(val < root%value) then
-            call insertRec(root%left, val, info)
-        else if(val > root%value) then
-            call insertRec(root%right, val, info)
+        if(.not. associated(raiz)) then
+            allocate(raiz)
+            raiz = nodo(valor=val, abb=abb_nuevo)
+        
+        else if(val < raiz%valor) then 
+            call insertRec(raiz%izquierda, val, abb_nuevo)
+
+        else if(val > raiz%valor) then
+            call insertRec(raiz%derecha, val, abb_nuevo)
         end if
 
-        root%height = maxHeight(getHeight(root%left), getHeight(root%right)) + 1
+        raiz%altura = maximo(obtenerAltura(raiz%izquierda), obtenerAltura(raiz%derecha)) + 1
 
-        if(getBalance(root) > 1) then
-            if(getBalance(root%right) < 0) then
-                root%right => rightRotation(root%right)
-                root => leftRotation(root)
+        if(obtenerBalance(raiz) > 1) then
+            if(obtenerBalance(raiz%derecha) < 0) then
+                raiz%derecha => rotacionDerecha(raiz%derecha)
+                raiz => rotacionIzquierda(raiz)
             else
-                root => leftRotation(root)
+                raiz => rotacionIzquierda(raiz)
             end if
         end if
 
-        if(getBalance(root) < -1) then
-            if(getBalance(root%left) > 0) then
-                root%left => leftRotation(root%left)
-                root => rightRotation(root)
+        if(obtenerBalance(raiz) < -1) then
+            if(obtenerBalance(raiz%izquierda) > 0) then
+                raiz%izquierda => rotacionIzquierda(raiz%izquierda)
+                raiz => rotacionDerecha(raiz)
+
             else
-                root => rightRotation(root)
+                raiz => rotacionDerecha(raiz)
             end if
         end if
     end subroutine insertRec
 
-    recursive function deleteRec(root, val) result(res)
-        type(node_avl), pointer :: root
+    recursive function deleteRec(raiz, val) result(res)
+        type(nodo), pointer :: raiz
         integer, intent(in) :: val
-        type(node_avl), pointer :: res
-        type(node_avl), pointer :: temp
 
-        if(.not. associated(root)) then
-            res => root
+        type(nodo), pointer :: temp
+        type(nodo), pointer :: res 
+        
+        if(.not. associated(raiz)) then
+            res => raiz
             return
-        end if 
+        end if
 
-        if(val < root%value) then
-            root%left => deleteRec(root%left, val)
-
-        else if(val > root%value) then
-            root%right => deleteRec(root%right, val)
+        if(val < raiz%valor) then
+            raiz%izquierda => deleteRec(raiz%izquierda, val)
         
+        else if(val > raiz%valor) then
+            raiz%derecha => deleteRec(raiz%derecha, val)
+
         else
-            if (.not. associated(root%left)) then
-                temp => root%right
-                deallocate(root)
+            if(.not. associated(raiz%izquierda)) then
+                temp => raiz%derecha
+                deallocate(raiz)
                 res => temp
-            else if (.not. associated(root%right)) then
-                temp => root%left
-                deallocate(root)
+
+            else if (.not. associated(raiz%derecha)) then
+                temp => raiz%izquierda
+                deallocate(raiz)
                 res => temp
+            
             else
-                call getMajorOfMinors(root%left, temp)
-                root%value = temp%value
-                root%left => deleteRec(root%left, temp%value)
+                call obtenerMayorDeMenores(raiz%izquierda, temp)
+                raiz%valor = temp%valor
+                raiz%izquierda => deleteRec(raiz%izquierda, temp%valor)
             end if
         end if
 
-        res => root
-        if(.not. associated(root)) return
+        res => raiz
+        if(.not. associated(raiz)) return
 
-        root%height = maxHeight(getHeight(root%left), getHeight(root%right)) + 1
+        raiz%altura = maximo(obtenerAltura(raiz%izquierda), obtenerAltura(raiz%derecha))
 
-        if(getBalance(root) > 1) then
-            if(getBalance(root%right) < 0) then
-                root%right => rightRotation(root%right)
-                root => leftRotation(root)
-
+        if(obtenerBalance(raiz) > 1) then
+            if(obtenerBalance(raiz%derecha) < 0) then
+                raiz%derecha => rotacionDerecha(raiz%derecha)
+                raiz => rotacionIzquierda(raiz)
             else
-                root => leftRotation(root)
+                raiz => rotacionIzquierda(raiz)
             end if
         end if
 
-        if(getBalance(root) < -1) then
-            if(getBalance(root%left) > 0) then
-                root%left => leftRotation(root%left)
-                root => rightRotation(root)
+        if(obtenerBalance(raiz) < -1) then
+            if(obtenerBalance(raiz%izquierda) > 0) then
+                raiz%izquierda => rotacionIzquierda(raiz%izquierda)
+                raiz => rotacionDerecha(raiz)
 
             else
-                root => rightRotation(root)
+                raiz => rotacionDerecha(raiz)
             end if
         end if
 
-        res => root
-        
+        res => raiz
     end function deleteRec
 
-    function leftRotation(root) result(rootRight)
-        type(node_avl), pointer, intent(in) :: root
-        type(node_avl), pointer :: rootRight
-        type(node_avl), pointer :: temp  
-        
-        rootRight => root%right
-        temp => root%right%left
+    function rotacionIzquierda(raiz) result(raizDerecha)
+        type(nodo), pointer, intent(in) :: raiz
+        type(nodo), pointer :: raizDerecha
+        type(nodo), pointer :: temp
 
-        rootRight%left => root
-        root%right => temp
+        raizDerecha => raiz%derecha
+        temp => raizDerecha%izquierda
 
-        root%height = maxHeight(getHeight(root%left), getHeight(root%right)) + 1
-        rootRight%height = maxHeight(getHeight(rootRight%left), getHeight(rootRight%right)) + 1
-    end function leftRotation
+        raizDerecha%izquierda => raiz
+        raiz%derecha => temp
 
-    function rightRotation(root) result(rootLeft)
-        type(node_avl), pointer, intent(in) :: root
-        type(node_avl), pointer :: rootLeft
-        type(node_avl), pointer :: temp
+        raiz%altura = maximo(obtenerAltura(raiz%izquierda), obtenerAltura(raiz%derecha)) + 1
+        raizDerecha%altura = maximo(obtenerAltura(raizDerecha%izquierda), obtenerAltura(raizDerecha%derecha)) + 1
+    end function rotacionIzquierda
 
-        rootLeft => root%left
-        temp => rootLeft%right
+    function rotacionDerecha(raiz) result(raizIzquierda)
+        type(nodo), pointer, intent(in) :: raiz
+        type(nodo), pointer :: raizIzquierda
+        type(nodo), pointer :: temp
 
-        rootLeft%right => root
-        root%left => temp
+        raizIzquierda => raiz%izquierda
+        temp => raizIzquierda%derecha
 
-        root%height = maxHeight(getHeight(root%left), getHeight(root%right) + 1)
-        rootLeft%height = maxHeight(getHeight(rootLeft%left), getHeight(rootLeft%right) + 1)
-    end function rightRotation
+        raizIzquierda%derecha => raiz
+        raiz%izquierda => temp
 
-    function maxHeight(left, right) result(res)
-        integer, intent(in) :: left
-        integer, intent(in) :: right
+        raiz%altura = maximo(obtenerAltura(raiz%izquierda), obtenerAltura(raiz%derecha)) + 1
+        raizIzquierda%altura = maximo(obtenerAltura(raizIzquierda%izquierda), obtenerAltura(raizIzquierda%derecha)) + 1
+    end function rotacionDerecha
+
+    recursive subroutine obtenerMayorDeMenores(raiz, mayor)
+        type(nodo), pointer :: raiz, mayor
+        if(associated(raiz%derecha)) then
+            call obtenerMayorDeMenores(raiz%derecha, mayor)
+        else
+            mayor => raiz
+        end if
+    end subroutine obtenerMayorDeMenores
+
+    recursive subroutine preordenRec(raiz)
+        type(nodo), pointer, intent(in) :: raiz
+
+        if(associated(raiz)) then
+            print *, raiz%valor
+            call preordenRec(raiz%izquierda)
+            call preordenRec(raiz%derecha)
+        end if
+    end subroutine preordenRec
+
+    function maximo(izquierda, derecha) result(res)
+        integer, intent(in) :: izquierda
+        integer, intent(in) :: derecha
 
         integer :: res
-        res = right
+        res = derecha
 
-        if(left >= right) then
-            res = left
+        if(izquierda >= derecha) then
+            res = izquierda
             return
         end if
-    end function maxHeight
+    end function maximo
 
-    function getHeight(n) result(res)
-        type(node_avl), pointer, intent(in) :: n
+    function obtenerBalance(raiz) result(res)
+        type(nodo), pointer, intent(in) :: raiz
+        integer :: res
+        
+        res = obtenerAltura(raiz%derecha) - obtenerAltura(raiz%izquierda)
+    end function obtenerBalance
+
+    function obtenerAltura(n) result(res)
+        type(nodo), pointer :: n
         integer :: res
         res = 0
 
         if(.not. associated(n)) return
-        res = n%height
-    end function getHeight
+        res = n%altura
+    end function obtenerAltura
 
-    function getBalance(root) result(res)
-        type(node_avl), intent(in) :: root
-
-        integer :: res
-        res = getHeight(root%right) - getHeight(root%left)
-    end function getBalance
-
-    recursive subroutine getMajorOfMinors(root, major)
-        type(node_avl), pointer :: root, major
-        if (associated(root%right)) then
-            call getMajorOfMinors(root%right, major)
-        else
-            major => root
-        end if
-    end subroutine getMajorOfMinors
-
-    recursive subroutine preorderRec(root)
-        type(node_avl), pointer, intent(in) :: root
-
-        if(associated(root)) then
-            print *, root%value
-            call preorderRec(root%left)
-            call preorderRec(root%right)
-        end if
-    end subroutine preorderRec
-
-    recursive subroutine printRec(root, name, io)
-        type(node_avl), pointer :: root
-        character(len=36) :: name
+    recursive subroutine imprimirRec(raiz, nombre, io)
+        type(nodo), pointer, intent(in) :: raiz
+        character(len=36), intent(in) :: nombre
         integer :: io
 
-        character(len=36) :: right
-        character(len=36) :: left
+        character(len=36) :: derecha
+        character(len=36) :: izquierda
 
-        right = generate_uuid()
-        left = generate_uuid()
+        derecha = generate_uuid()
+        izquierda = generate_uuid()
 
-        if(associated(root)) then
-            write(io, *)'"Nodo'//name//'"[label = "', root%value, '"]'
-            if(associated(root%left)) then
-                write(io, *)'"Nodo'//name//'"->"Nodo'//left//'"'
+        if(associated(raiz)) then
+            !"Nodo_uuid"[Label="1"]
+            write(io, *) '"Nodo'//nombre//'"[label= "', raiz%valor, '"]'
+
+            if(associated(raiz%izquierda)) then
+                !"Nodo_uuid"->"Nodo_uuidHijoIzquierdo"
+                write(io, *) '"Nodo'//nombre//'"->"Nodo'//izquierda//'"'
             end if
-            if(associated(root%right)) then
-                write(io, *)'"Nodo'//name//'"->"Nodo'//right//'"'
+
+            if(associated(raiz%derecha)) then
+                !"Nodo_uuid"->"Nodo_uuidHijoDerecho"
+                write(io, *) '"Nodo'//nombre//'"->"Nodo'//derecha//'"'
             end if
-            call printRec(root%left, left, io)
-            call printRec(root%right, right, io)
+            call imprimirRec(raiz%izquierda, izquierda, io)
+            call imprimirRec(raiz%derecha, derecha, io)
         end if
-    end subroutine printRec
+    end subroutine imprimirRec
+
+    subroutine graficar(self)
+        class(avl), intent(in) :: self
+        integer :: io
+        integer :: i
+        character(len=100) :: comando
+
+        io = 1
+        open(newunit=io, file="./avl_tree.dot")
+        comando = "dot -Tpng ./avl_tree.dot -o ./avl_tree.png"
+
+        write(io, *) "digraph G {"
+            !Graficar
+        if(associated(self%raiz)) then
+            call imprimirRec(self%raiz, generate_uuid(), io)
+        end if
+        write(io, *) "}"
+        close(io)
+
+        call execute_command_line(comando, exitstat=i)
+
+        if(i == 1) then
+            print *, "Error al momento de crear la imagen"
+        else
+            print *, "La imagen fue generada exitosamente"
+        end if
+    end subroutine graficar
 
 end module avl_m

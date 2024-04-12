@@ -1,25 +1,27 @@
 program MenuPrincipal
-    use linked_list_m
+    use List_of_list_m
+    use abb_m
     use avl_m
     use json_module
     use btree_m
-    use abb_m
+    
     use matrix_m
     use cliente_m
 
     implicit none
     type(btree) :: mi_arbol
     type(cliente) :: cliente1
-    type(linked_list) :: lista_usuarios
+    type(List_of_list) :: lista_usuarios
     type(json_file) :: json
     type(json_core) :: jsonc
     type(json_value), pointer :: listPointer, clientePointer, attributePointer, attributePointer2, capasPointer
         !Variable para arbol de capas
     integer, dimension(:), allocatable :: capas, imgs
-    type(abb) :: arbol
+    
+    type(abb) :: arbol, nuevo_arbol
     type(matrix) :: matriz
     type(avl) :: arbolavl
-    type(pixel) :: info
+    type(pixel) :: info, info2
   logical :: found
   type(json_value), pointer ::  capaPointer, pixelPointer
     
@@ -30,8 +32,7 @@ program MenuPrincipal
   character(len=40) :: nombre_json, id_str
   
   ! Variables para el registro de usuarios
-  character(len=:), allocatable :: nombre_completo, password_usuario, dpi, str_fila, str_columna
-
+  character(len=:), allocatable :: nombre_completo, password_usuario, str_fila, str_columna, dpi
   character(len=:), allocatable :: nombre_cliente, password
 
 
@@ -66,7 +67,7 @@ contains
 function string_to_integer(str)
     character(len=*), intent(in) :: str
     integer :: string_to_integer
-    integer :: i, num
+    integer(kind=8) :: i, num
 
     ! Inicializar num a cero
     num = 0
@@ -87,7 +88,7 @@ function string_to_integer(str)
 end function string_to_integer
 
   subroutine carga_masiva_usuarios()
-    integer :: int_dpi
+    integer(kind=8):: int_dpi
       print *, 'Ha seleccionado Carga masiva de clientes'
       ! read the file
       print *, 'Ingrese el nombre del  archivo JSON:'
@@ -194,7 +195,7 @@ end subroutine IniciarSesion
         character(len=20), intent(in) :: usuario
         print *, "---- MENu Usuario ----" // usuario
         print *, "1. Visualizar reportes de las estructuras"
-        print *, "2. Navegacion y gestion de imágenes."
+        print *, "2. Navegacion y gestion de imagenes."
         print *, "3. Opciones de carga masiva."
         print *, "4. Salir."
         print *, "Seleccione una opcion: "
@@ -205,18 +206,78 @@ end subroutine IniciarSesion
       print *, "1. arbol B de usuarios (Grafico)"
       print *, "2. Operaciones sobre los usuarios (insertar, modificar y eliminar)"
       print *, "3. Operaciones de carga masiva de usuarios."
-      print *, "4. Salir."
+      print *, "4. Reportes Adminsitrador."
+      print *, "5, Salir"
       print *, "Seleccione una opcion: "
   end subroutine MostrarMenuAdministrador
   
   subroutine grafico_arbol_usuarios()
       print *, "Grafico del arbol B de usuarios."
+      call mi_arbol%graphTree()
+      
   end subroutine grafico_arbol_usuarios
   
+  subroutine MostrarOperaciones()
+      print *, "---- Operaciones sobre los usuarios ----"
+      print *, "1. Registrar un nuevo usuario"
+      print *, "2. Modificar usuario"
+      print *, "3. Eliminar usuario"
+      print *, "4. Salir."
+      print *, "Seleccione una opcion: "
+  end subroutine MostrarOperaciones
+
   subroutine operaciones_usuarios()
-      print *, "Operaciones sobre los usuarios (insertar, modificar y eliminar)."
+    implicit none
+      integer :: opcion
+      
+      do
+          call MostrarOperaciones()
+          read(*, *) opcion
+          
+          select case(opcion)
+          case(1)
+              call RegistrarUsuario()
+          case(2)
+              call ModificarUsuario()
+          case(3)
+              call EliminarUsuario()
+          case(4)
+              exit
+          case default
+              print *, "Opcion no valida. Por favor, seleccione una opcion valida."
+          end select
+      end do
   end subroutine operaciones_usuarios
-  
+
+  subroutine ModificarUsuario()
+    implicit none
+character(len=20) :: nombre, password
+character(len=20) :: nombre_nuevo, password_nuevo
+print *, "Modificar Usuario."
+print *, "Ingrese el nombre completo del  usuario: "
+read(*, '(A)') nombre
+print *, "Ingrese la contraseña del usuario: "
+read(*, '(A)') password
+print *, "Ingrese el nuevo nombre del usuario: "
+read(*, '(A)') nombre_nuevo
+print *, "Ingrese la nueva contraseña del usuario: "
+read(*, '(A)') password_nuevo
+call mi_arbol%modificar_usuario(nombre, password, nombre_nuevo, password_nuevo)
+
+
+end subroutine ModificarUsuario
+
+subroutine EliminarUsuario()
+    implicit none
+character(len=20) :: nombre, password
+print *, "Eliminar Usuario."
+print *, "Ingrese el nombre completo del  usuario: "
+read(*, '(A)') nombre
+print *, "Ingrese la contraseña del usuario: "
+read(*, '(A)') password
+call mi_arbol%eliminar_usuario(nombre, password)
+end subroutine EliminarUsuario
+
   subroutine MenuAdministrador()
       implicit none
       integer :: opcion
@@ -231,26 +292,65 @@ end subroutine IniciarSesion
           case(2)
               call operaciones_usuarios()
           case(3)
-              call carga_masiva_usuarios()
-          case(4)
-              exit
+            call carga_masiva_usuarios()
+        case(4)
+            call reportes_Admin()
+        case(5)
+            exit
           case default
               print *, "Opcion no valida. Por favor, seleccione una opcion valida."
           end select
       end do
   end subroutine MenuAdministrador
   
+  subroutine reportes_Admin()
+    implicit none
+        integer :: opcion
+        do
+          call Mostrar_reportes_Admin()
+          read(*, *) opcion
+          
+          select case(opcion)
+          case(1)
+              call reporte_uno()
+          case(2)
+              call mi_arbol%mostrarClientes()
+          case(3)
+              exit
+          case default
+              print *, "Opcion no valida. Por favor, seleccione una opcion valida."
+          end select
+        end do
+  end subroutine reportes_Admin
+
+  subroutine reporte_uno()
+    implicit none
+    integer(kind=8):: int_dpi
+    
+    print *, "Ingrese el DPI del usuario a reportar: "
+    read*,int_dpi 
+    call mi_arbol%buscarCliente(int_dpi)
+  end subroutine reporte_uno
+  
+  subroutine Mostrar_reportes_Admin()
+    print *, "Reportes del Administrador."
+      print *, "1. Reporte un usuario."
+        print *, "2. Reporte todos los usuarios."
+        print *, "3. Salir."
+        print *, "Seleccione una opcion: "
+    end subroutine Mostrar_reportes_Admin
   subroutine RegistrarUsuario()
     implicit none
     character(len=40) :: nombre_completo, password_usuario
-      integer :: int_dpi2
+    integer(kind=8):: int_dpi2
       ! Logica para el registro de usuarios
       print *, "Ingrese el nombre completo del nuevo usuario: "
       read(*, '(A)') nombre_completo
       print *, "Ingrese el DPI del nuevo usuario: "
-      read(*, *) int_dpi2
+      read*,int_dpi2 
       print *, "Ingrese la contrasena para el nuevo usuario: "
       read(*, '(A)') password_usuario
+        
       cliente1 = cliente(dpi=int_dpi2, nombre=nombre_completo, contrasena=password_usuario)
           call mi_arbol%insert(cliente1)
   end subroutine RegistrarUsuario
@@ -258,16 +358,166 @@ end subroutine IniciarSesion
   subroutine AcercaDe
       implicit none
       
-      print *, "Este es un programa de ejemplo para un menu en Fortran."
+      print *, "Jorge Alejandro De Leon Batres."
   end subroutine AcercaDe
 
   subroutine reportes_estructuras()
-      print *, "Reportes de las estructuras."
+        implicit none
+        integer :: opcion
+        do
+            call MostrarMenuReportes()
+            read(*, *) opcion
+            
+            select case(opcion)
+            case(1)
+                call arbolavl%graficar()
+            case(2)
+                call arbol%graph_abb("capas")
+            case(3)
+                call listarCapas()
+            case(4)
+                exit
+            case default
+                print *, "Opcion no valida. Por favor, seleccione una opcion valida."
+            end select
+        end do
   end subroutine reportes_estructuras
 
+    subroutine listarCapas()
+        print *, "Listado inorder de capas:"
+        call arbol%inorder_abb()
+        print *, "Listado Posorden de capas."
+        call arbol%posorder_abb()
+        print *, "Listado Preorden de capas."
+        call arbol%preorder_abb()
+    end subroutine listarCapas
+
+  subroutine MostrarMenuReportes()
+        print *, "---- Reportes de las estructuras ----"
+        print *, "1. Reporte de arbol AVL"
+        print *, "2. Reporte de arbol de capas"
+        print *, "3. Reporte de lista de capas"
+        print *, "4. Salir."
+        print *, "Seleccione una opcion: "
+    end subroutine MostrarMenuReportes
+
     subroutine gestion_imagenes()
-        print *, "Gestion de imagenes."
+        implicit none
+        integer :: opcion
+        do
+            call MostrarMenuImg()
+            read(*, *) opcion
+            
+            select case(opcion)
+            case(1)
+                call verImagen()
+            case(2)
+                call MenuOrden()
+            case(3)
+                call Amplitud()
+            case(4)
+                call ImgCapa()
+            case(5)
+                call eliminar_imagen()
+            case(6)
+                exit
+            case default
+                print *, "Opcion no valida. Por favor, seleccione una opcion valida."
+            end select
+        end do
+
     end subroutine gestion_imagenes
+
+    subroutine eliminar_imagen()
+        implicit none
+        character:: nombre_a
+        integer  :: id_img
+        print *, "Ingrese el nombre del album: "
+        read(*, *) nombre_a
+        print *, "Ingrese el ID de la imagen: "
+        read(*, *) id_img
+    end subroutine eliminar_imagen
+
+    subroutine mostrarMenuImg()
+        print *, "---- Gestion de imagenes ----"
+        print *, "1. Ver imagen"
+        print *, "2. Menu de ordenamiento"
+        print *, "3. Recorrido en amplitud"
+        print *, "4. Imagen por capa"
+        print *, "5. Eliminar Imagen."
+        print *, "6. Salir."
+        print *, "Seleccione una opcion: "
+
+    end subroutine mostrarMenuImg
+
+    subroutine verImagen()
+        implicit none
+        integer :: id_capa
+        print *, "Ingrese el ID de la capa a visualizar: "
+        read(*, *) id_capa
+        call arbol%buscarCapa_abb(id_capa)
+    end subroutine verImagen
+
+    subroutine MenuOrden()
+        implicit none
+        integer :: opcion
+        do
+            call MostrarMenuOrden()
+            read(*, *) opcion
+            
+            select case(opcion)
+            case(1)
+                call InOrden()
+            case(2)
+                call PreOrden()
+            case(3)
+                call PostOrden()
+            case(4)
+                exit
+            case default
+                print *, "Opcion no valida. Por favor, seleccione una opcion valida."
+            end select
+        end do
+    end subroutine MenuOrden
+
+    subroutine MostrarMenuOrden()
+        print *, "---- Menu de ordenamiento ----"
+        print *, "1. InOrden"
+        print *, "2. PreOrden"
+        print *, "3. PostOrden"
+        print *, "4. Salir."
+        print *, "Seleccione una opcion: "
+    end subroutine MostrarMenuOrden
+
+    subroutine InOrden()
+        print *, "Recorrido InOrden"
+        call arbol%inOrder()
+    end subroutine InOrden
+
+    subroutine PreOrden()
+        print *, "Recorrido PreOrden"
+        call arbol%preOrder()
+    end subroutine PreOrden
+
+    subroutine PostOrden()
+        print *, "Recorrido PostOrden"
+        call arbol%posOrder()
+    end subroutine PostOrden
+
+    subroutine Amplitud()
+        print *, "Recorrido en amplitud"
+        call arbol%amplitudOrden()
+    end subroutine Amplitud
+
+    subroutine ImgCapa()
+        implicit none
+        integer :: id_capa
+        print *, "Ingrese el ID de la capa a visualizar: "
+        read(*, *) id_capa
+        call arbol%buscar(id_capa)
+    end subroutine ImgCapa
+
+
 
     subroutine opciones_carga_masiva()
         implicit none
@@ -386,9 +636,11 @@ subroutine CargaImagenes()
         call jsonc%info(capasPointer, n_children=num_pasadas)
         do j = 1, num_pasadas
             print *, "num capa: ", capas(j)
+            info2 = arbol%buscar_abb(capas(j))
+            call nuevo_arbol%insert_abb(capas(j), info2)
         end do
 
-        
+        call arbolavl%insert(id, nuevo_arbol)
         ! imprimir las capas asociadas
     end do
 end subroutine CargaImagenes
@@ -426,11 +678,12 @@ end subroutine CargaImagenes
         call jsonc%info(capasPointer, n_children=num_pasadas)
         do j = 1, num_pasadas
             print *, "num imgs: ", imgs(j)
+            call lista_usuarios%insert_album(nombre_album,imgs(j))
         end do
         ! imprimir las capas asociadas
         
     end do
-
+    call lista_usuarios%printList()
 
     end subroutine CargaAlbumes
 

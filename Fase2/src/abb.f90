@@ -2,7 +2,6 @@ module abb_m
     use uuid_module
     implicit none
     
-
     type :: pixel
         integer :: fila
         integer :: columna
@@ -23,11 +22,101 @@ end type node
         procedure :: insert_abb
         procedure :: delete_abb
         procedure :: preorder_abb
+        procedure :: buscar_abb
         procedure :: inorder_abb
         procedure :: posorder_abb
         procedure :: graph_abb
+        procedure :: buscarCapa_abb
+        procedure :: inOrder
+        procedure :: preOrder
+        procedure :: posOrder
+        procedure :: amplitudOrden
+        procedure :: buscar
     end type abb
 contains
+
+subroutine buscar(self, val)
+    class(abb), intent(in) :: self
+    integer, intent(in) :: val
+    type(pixel) :: info
+
+    ! Inicializamos la información con valores por defecto
+    info%fila = -1
+    info%columna = -1
+    info%color = 'Ninguno'
+
+    ! Realizamos la búsqueda en el árbol
+    if (associated(self%root)) then
+        call buscarRec_abb(self%root, val, info)
+    end if
+end subroutine buscar
+
+subroutine amplitudOrden(self)
+    class(abb), intent(in) :: self
+    print *, "Recorrido por amplitud", self%root%value
+
+    end subroutine amplitudOrden
+
+subroutine posOrder(self)
+    class(abb), intent(in) :: self
+    call posordenRec_abb(self%root)
+end subroutine posOrder
+
+subroutine preOrder(self)
+    class(abb), intent(in) :: self
+    call preorderRec_abb(self%root)
+end subroutine preOrder
+
+subroutine inOrder(self)
+    class(abb), intent(in) :: self
+    call inordenRec_abb(self%root)
+end subroutine inOrder
+
+subroutine buscarCapa_abb(self, val)
+    class(abb), intent(in) :: self
+    integer, intent(in) :: val
+    
+    print *, "Buscando capa ", val
+
+end subroutine buscarCapa_abb
+function buscar_abb(self, val) result(info)
+    class(abb), intent(in) :: self
+    integer, intent(in) :: val
+    type(pixel) :: info
+
+    ! Inicializamos la información con valores por defecto
+    info%fila = -1
+    info%columna = -1
+    info%color = 'Ninguno'
+
+    ! Realizamos la búsqueda en el árbol
+    if (associated(self%root)) then
+        call buscarRec_abb(self%root, val, info)
+    end if
+end function buscar_abb
+
+recursive subroutine buscarRec_abb(root, val, info)
+    type(node), pointer :: root
+    integer, intent(in) :: val
+    type(pixel), intent(inout) :: info
+
+    if (associated(root)) then
+        if (val == root%value) then
+            ! Si encontramos el valor, actualizamos la información
+            if (size(root%pixeles) > 0) then
+                info = root%pixeles(1)
+            end if
+        else if (val < root%value) then
+            ! Si el valor buscado es menor, buscamos en el subárbol izquierdo
+            call buscarRec_abb(root%left, val, info)
+        else
+            ! Si el valor buscado es mayor, buscamos en el subárbol derecho
+            call buscarRec_abb(root%right, val, info)
+        end if
+    end if
+end subroutine buscarRec_abb
+
+
     !Subrutinas del tipo abb
     subroutine insert_abb(self, val, info)
         class(abb), intent(inout) :: self
