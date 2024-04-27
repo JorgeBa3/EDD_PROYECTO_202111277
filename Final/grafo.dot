@@ -1,0 +1,11 @@
+ digraph g {
+ "Nodo1"[label="1"]                                                                                                                                    
+ "Nodo2"[label="2"]                                                                                                                                    
+ "Nodo2"             ->"Nodo1"             [dir = both]
+ "Nodo2"[label="2"]                                                                                                                                    
+ "Nodo5"[label="5"]                                                                                                                                    
+ "Nodo10"[label="10"]                                                                                                                                  
+ "Nodo10"            ->"Nodo5"             [dir = both]
+ "Nodo21"[label="21"]                                                                                                                                  
+ "Nodo21"            ->"Nodo2"             [dir = both]
+ }

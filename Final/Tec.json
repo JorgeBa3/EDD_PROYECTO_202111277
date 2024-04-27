@@ -1,0 +1,18 @@
+[
+    {
+        "dpi": "3746582726365",
+        "nombre": "Juan Jose",
+        "apellido": "Gonzalez Carrillo",
+        "genero": "Masculino",
+        "direccion": "8 calle 3-45 zona 1",
+        "telefono": "12345678"
+    },
+    {
+        "dpi": "1234567891011",
+        "nombre": "Maria Jose",
+        "apellido": "Portillo Velazquez",
+        "genero": "Femenino",
+        "direccion": "6 calle 8-40 Villa Nueva",
+        "telefono": "12345677"
+    }
+]

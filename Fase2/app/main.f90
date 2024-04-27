@@ -584,7 +584,7 @@ end subroutine EliminarUsuario
         ! Iterar sobre cada pixel
         do j = 1, num_pasadas
             call jsonc%get_child(pixelPointer, j, attributePointer2, found)
-            ! Obtener fila del pixel
+            ! Obtener s1
             call jsonc%get_child(attributePointer2, 'fila', attributePointer, found)
             call jsonc%get(attributePointer, fila)
             ! Obtener columna del pixel
