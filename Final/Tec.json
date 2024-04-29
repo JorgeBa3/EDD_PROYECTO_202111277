@@ -1,6 +1,6 @@
 [
     {
-        "dpi": "3746582726365",
+        "dpi": "1",
         "nombre": "Juan Jose",
         "apellido": "Gonzalez Carrillo",
         "genero": "Masculino",
@@ -8,7 +8,56 @@
         "telefono": "12345678"
     },
     {
-        "dpi": "1234567891011",
+        "dpi": "2",
+        "nombre": "Maria Jose",
+        "apellido": "Portillo Velazquez",
+        "genero": "Femenino",
+        "direccion": "6 calle 8-40 Villa Nueva",
+        "telefono": "12345677"
+    },
+    {
+        "dpi": "3",
+        "nombre": "Maria Jose",
+        "apellido": "Portillo Velazquez",
+        "genero": "Femenino",
+        "direccion": "6 calle 8-40 Villa Nueva",
+        "telefono": "12345677"
+    },
+    {
+        "dpi": "4",
+        "nombre": "Maria Jose",
+        "apellido": "Portillo Velazquez",
+        "genero": "Femenino",
+        "direccion": "6 calle 8-40 Villa Nueva",
+        "telefono": "12345677"
+    },
+    {
+        "dpi": "5",
+        "nombre": "Maria Jose",
+        "apellido": "Portillo Velazquez",
+        "genero": "Femenino",
+        "direccion": "6 calle 8-40 Villa Nueva",
+        "telefono": "12345677"
+    },
+    {
+        "dpi": "6",
+        "nombre": "Maria Jose",
+        "apellido": "Portillo Velazquez",
+        "genero": "Femenino",
+        "direccion": "6 calle 8-40 Villa Nueva",
+        "telefono": "12345677"
+    },
+    {
+        "dpi": "7",
+        "nombre": "Maria Jose",
+        "apellido": "Portillo Velazquez",
+        "genero": "Femenino",
+        "direccion": "6 calle 8-40 Villa Nueva",
+        "telefono": "12345677"
+    }
+    ,
+    {
+        "dpi": "8",
         "nombre": "Maria Jose",
         "apellido": "Portillo Velazquez",
         "genero": "Femenino",

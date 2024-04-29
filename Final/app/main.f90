@@ -1,5 +1,5 @@
 program main
-    use tabla_hash_m
+    use hash_module
     use lista_adyacencia_m
     use abb_m
     use json_module
@@ -12,7 +12,9 @@ program main
     character(20) :: admin_password = 'a' !ProyectoFase3
     type(abb) :: arbol_sucursales
     type(ListaAdyacencia) :: rutas
-    type(TablaHash) :: tabla
+    type(hash) :: tabla
+
+    call tabla%init(7, 20, 70)
     do
         print *, 'Ingrese su nombre de usuario:'
         read *, username
@@ -31,7 +33,7 @@ program main
     contains
     function string_to_integer(str)
         character(len=*), intent(in) :: str
-        integer(kind=8) :: string_to_integer
+        integer(kind=16) :: string_to_integer
         integer :: i, num
     
         ! Inicializar num a cero
@@ -166,7 +168,7 @@ program main
         character(len=:), allocatable :: dpi
         character(len=:), allocatable :: nombre, apellido, genero, direccion, telefono
         integer :: size, i
-        integer(kind=8) :: dpi_int
+        integer(kind=16) :: dpi_int
         logical :: found
         
         call json%initialize()
@@ -219,9 +221,11 @@ program main
             call jsonc%get(attributePointer, telefono)
             print *, "Telefono tecnico: ", telefono
             tecnico = persona(dpi_int, nombre, apellido, genero, direccion, telefono)
-            call tabla%insert(tecnico)
+            call tabla%insert_hash(tecnico)
+            
         end do
-        call tabla%print()
+        print *, 'Tecnicos cargados exitosamente'
+        call tabla%show()
     end subroutine carga_tecnicos
 
     subroutine menu_reportes()
