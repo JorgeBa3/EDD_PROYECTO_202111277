@@ -1,5 +1,6 @@
 program main
     use hash_module
+    use iso_fortran_env, only: int64
     use lista_adyacencia_m
     use abb_m
     use json_module
@@ -14,7 +15,7 @@ program main
     type(ListaAdyacencia) :: rutas
     type(hash) :: tabla
 
-    call tabla%init(7, 20, 70)
+    call tabla%init(7, 13, 70)
     do
         print *, 'Ingrese su nombre de usuario:'
         read *, username
@@ -168,7 +169,7 @@ program main
         character(len=:), allocatable :: dpi
         character(len=:), allocatable :: nombre, apellido, genero, direccion, telefono
         integer :: size, i
-        integer(kind=16) :: dpi_int
+        integer(kind=int64) :: dpi_int
         logical :: found
         
         call json%initialize()
@@ -186,15 +187,13 @@ program main
         
         call json%get_core(jsonc)
         call json%get('', listPointer, found)
-        
+        print *, "Size: ", size
         do i = 1, size
             call jsonc%get_child(listPointer, i, tecnicoPointer, found)
-            print *, "Tecnico ", i
             !imprimiendo el atributo dpi
             call jsonc%get_child(tecnicoPointer, 'dpi', attributePointer, found)
             call jsonc%get(attributePointer, dpi)
-            dpi_int = string_to_integer(dpi)
-            print *, "DPI tecnico: ", dpi_int
+            print *, "DPI tecnico: ", dpi
 
             !imprimiendo el atributo nombre
             call jsonc%get_child(tecnicoPointer, 'nombre', attributePointer, found)
@@ -220,12 +219,16 @@ program main
             call jsonc%get_child(tecnicoPointer, 'telefono', attributePointer, found)
             call jsonc%get(attributePointer, telefono)
             print *, "Telefono tecnico: ", telefono
+
+            read(dpi, *) dpi_int  
             tecnico = persona(dpi_int, nombre, apellido, genero, direccion, telefono)
             call tabla%insert_hash(tecnico)
             
         end do
         print *, 'Tecnicos cargados exitosamente'
+        call tabla%generate_dot_file()
         call tabla%show()
+        call tabla%buscar_tecnico(dpi_int)
     end subroutine carga_tecnicos
 
     subroutine menu_reportes()

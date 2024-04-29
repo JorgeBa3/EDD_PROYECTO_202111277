@@ -1,0 +1,9 @@
+digraph HashTable {
+    node [shape=record];
+    node1 [label="{<dpi>   1234567890123|<nombre>Juan Jose
+}"];
+    node2 [label="{<dpi>   3008431000101|<nombre>Maria Jose
+}"];
+    node6 [label="{<dpi>   3629835500101|<nombre>Maria juana
+}"];
+}
