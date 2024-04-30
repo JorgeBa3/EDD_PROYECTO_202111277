@@ -1,6 +1,6 @@
 [
     {
-        "dpi": "1234567890123",
+        "dpi": "1",
         "nombre": "Juan Jose",
         "apellido": "Gonzalez Carrillo",
         "genero": "Masculino",
@@ -8,7 +8,7 @@
         "telefono": "12345678"
     },
     {
-        "dpi": "3008431000101",
+        "dpi": "15",
         "nombre": "Maria Jose",
         "apellido": "Portillo Velazquez",
         "genero": "Femenino",
@@ -16,11 +16,139 @@
         "telefono": "12345677"
     },
     {
-        "dpi": "3629835500101",
+        "dpi": "3",
         "nombre": "Maria juana",
-        "apellido": "Gonzalez Carrillo",
+        "apellido": "Portillo Velazquez",
         "genero": "Femenino",
         "direccion": "6 calle 8-40 Villa Nueva",
         "telefono": "12345677"
+    },
+    {
+        "dpi": "4",
+        "nombre": "Pedro",
+        "apellido": "Lopez Perez",
+        "genero": "Masculino",
+        "direccion": "10 avenida 5-30 zona 2",
+        "telefono": "98765432"
+    },
+    {
+        "dpi": "5",
+        "nombre": "Ana Maria",
+        "apellido": "Gutierrez",
+        "genero": "Femenino",
+        "direccion": "15 calle 10-50 Mixco",
+        "telefono": "65432198"
+    },
+    {
+        "dpi": "6",
+        "nombre": "Carlos",
+        "apellido": "Castillo Ramirez",
+        "genero": "Masculino",
+        "direccion": "20 avenida 3-25 zona 4",
+        "telefono": "12349876"
+    },
+    {
+        "dpi": "7",
+        "nombre": "Luisa",
+        "apellido": "Garcia",
+        "genero": "Femenino",
+        "direccion": "4 avenida 15-75 zona 10",
+        "telefono": "13579246"
+    },
+    {
+        "dpi": "8",
+        "nombre": "Diego",
+        "apellido": "Martinez",
+        "genero": "Masculino",
+        "direccion": "12 calle 6-20 zona 3",
+        "telefono": "24681357"
+    },
+    {
+        "dpi": "9",
+        "nombre": "Laura",
+        "apellido": "Perez",
+        "genero": "Femenino",
+        "direccion": "9 avenida 2-15 zona 6",
+        "telefono": "98765432"
+    },
+    {
+        "dpi": "10",
+        "nombre": "Roberto",
+        "apellido": "Rodriguez",
+        "genero": "Masculino",
+        "direccion": "18 calle 12-30 zona 7",
+        "telefono": "36925814"
+    },
+    {
+        "dpi": "11",
+        "nombre": "Elena",
+        "apellido": "Hernandez",
+        "genero": "Femenino",
+        "direccion": "7 avenida 9-45 zona 5",
+        "telefono": "74185296"
+    },
+    {
+        "dpi": "12",
+        "nombre": "Manuel",
+        "apellido": "Diaz",
+        "genero": "Masculino",
+        "direccion": "3 calle 20-10 zona 9",
+        "telefono": "85296374"
+    },
+    {
+        "dpi": "13",
+        "nombre": "Marta",
+        "apellido": "Sanchez",
+        "genero": "Femenino",
+        "direccion": "5 avenida 18-22 zona 11",
+        "telefono": "15926374"
+    },
+    {
+        "dpi": "14",
+        "nombre": "Jorge",
+        "apellido": "Ramirez",
+        "genero": "Masculino",
+        "direccion": "11 calle 4-40 zona 8",
+        "telefono": "35795124"
+    },
+    {
+        "dpi": "16",
+        "nombre": "Rosa",
+        "apellido": "Gonzalez",
+        "genero": "Femenino",
+        "direccion": "2 avenida 7-30 zona 12",
+        "telefono": "75395124"
+    },
+    {
+        "dpi": "17",
+        "nombre": "Ricardo",
+        "apellido": "Garcia",
+        "genero": "Masculino",
+        "direccion": "6 calle 15-10 zona 13",
+        "telefono": "75395124"
+    },
+    {
+        "dpi": "18",
+        "nombre": "Sofia",
+        "apellido": "Gutierrez",
+        "genero": "Femenino",
+        "direccion": "8 avenida 5-20 zona 14",
+        "telefono": "75395124"
+    },
+    {
+        "dpi": "19",
+        "nombre": "Carlos",
+        "apellido": "Gonzalez",
+        "genero": "Masculino",
+        "direccion": "10 calle 3-40 zona 15",
+        "telefono": "75395124"
+    },
+    {
+        "dpi": "20",
+        "nombre": "Maria",
+        "apellido": "Garcia",
+        "genero": "Femenino",
+        "direccion": "12 avenida 8-30 zona 16",
+        "telefono": "75395124"
     }
 ]

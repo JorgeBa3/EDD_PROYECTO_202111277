@@ -1,9 +1,41 @@
 digraph HashTable {
     node [shape=record];
-    node1 [label="{<dpi>   1234567890123|<nombre>Juan Jose
+    node1 [label="{<dpi>               1|<nombre>Juan Jose
 }"];
-    node2 [label="{<dpi>   3008431000101|<nombre>Maria Jose
+    node3 [label="{<dpi>               3|<nombre>Maria juana
 }"];
-    node6 [label="{<dpi>   3629835500101|<nombre>Maria juana
+    node4 [label="{<dpi>               4|<nombre>Pedro
+}"];
+    node5 [label="{<dpi>               5|<nombre>Ana Maria
+}"];
+    node6 [label="{<dpi>               6|<nombre>Carlos
+}"];
+    node7 [label="{<dpi>               7|<nombre>Luisa
+}"];
+    node8 [label="{<dpi>               8|<nombre>Diego
+}"];
+    node9 [label="{<dpi>               9|<nombre>Laura
+}"];
+    node10 [label="{<dpi>              10|<nombre>Roberto
+}"];
+    node11 [label="{<dpi>              11|<nombre>Elena
+}"];
+    node12 [label="{<dpi>              12|<nombre>Manuel
+}"];
+    node13 [label="{<dpi>              13|<nombre>Marta
+}"];
+    node14 [label="{<dpi>              14|<nombre>Jorge
+}"];
+    node15 [label="{<dpi>              15|<nombre>Maria Jose
+}"];
+    node16 [label="{<dpi>              16|<nombre>Rosa
+}"];
+    node17 [label="{<dpi>              17|<nombre>Ricardo
+}"];
+    node18 [label="{<dpi>              18|<nombre>Sofia
+}"];
+    node19 [label="{<dpi>              19|<nombre>Carlos
+}"];
+    node20 [label="{<dpi>              20|<nombre>Maria
 }"];
 }

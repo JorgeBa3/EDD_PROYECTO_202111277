@@ -8,6 +8,8 @@ module hash_module
         character(len=20) :: genero
         character(len=50) :: direccion
         character(len=20) :: telefono
+        !integer :: cantidad_pedidos
+        !integer :: cantidad_realizados
     end type persona
 
     type hash
@@ -24,9 +26,43 @@ module hash_module
         procedure :: rehashing
         procedure :: show
         procedure :: buscar_tecnico
+        procedure :: generate_dot_file_all_tecnicos
     end type hash
 
 contains
+    
+subroutine generate_dot_file_all_tecnicos(this)
+    class(hash), intent(in) :: this
+    integer :: i
+    character(len=50) :: filename
+
+    ! Abre el archivo para escribir
+    filename = 'hash_table_all_tecnicos.dot'
+    open(unit=10, file=filename, status='unknown')
+
+    ! Escribe el encabezado del archivo DOT
+    write(10, '(A)') 'digraph HashTable {'
+    write(10, '(A)') '    node [shape=record];'
+
+    ! Escribe los nodos de la tabla hash para todos los técnicos almacenados
+    do i = 1, this%m
+        if (this%personas(i)%dpi /= -1) then
+            write(10, '(A, I0, A, I16, A, A, A, A, A, A, A, A, A, A, A)') '    node', i, ' [label="{<dpi>', this%personas(i)%dpi,&
+            '|<nombre>', trim(this%personas(i)%nombre), '|<apellido>', trim(this%personas(i)%apellido),& 
+            '|<genero>', trim(this%personas(i)%genero), '|<direccion>', trim(this%personas(i)%direccion),& 
+            '|<telefono>', trim(this%personas(i)%telefono), '}"];'
+        end if
+    end do
+
+    ! Cierra el archivo
+    write(10, '(A)') '}'
+    close(10)
+
+    ! Ejecuta el comando dot para generar la imagen
+    call execute_command_line('dot -Tpng hash_table_all_tecnicos.dot -o hash_table_all_tecnicos.png')
+end subroutine generate_dot_file_all_tecnicos
+
+
     subroutine buscar_tecnico(this, dpi)
         class(hash), intent(inout) :: this
         integer(kind=int64), intent(in) :: dpi
@@ -103,7 +139,7 @@ contains
         integer :: i
         write (*, '(a)', advance='no') '['
         do i = 1, this%m
-            write (*, '(1I13)', advance='no') this%personas(i)%dpi
+            write (*, '(1I15)', advance='no') this%personas(i)%dpi
         end do
         write(*, '(A, I0, A)') '] ', (this%n * 100 / this%m), '%'
     end subroutine show

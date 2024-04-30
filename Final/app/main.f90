@@ -223,12 +223,13 @@ program main
             read(dpi, *) dpi_int  
             tecnico = persona(dpi_int, nombre, apellido, genero, direccion, telefono)
             call tabla%insert_hash(tecnico)
-            
+            call tabla%show()
         end do
         print *, 'Tecnicos cargados exitosamente'
         call tabla%generate_dot_file()
         call tabla%show()
         call tabla%buscar_tecnico(dpi_int)
+        call tabla%generate_dot_file_all_tecnicos()
     end subroutine carga_tecnicos
 
     subroutine menu_reportes()
